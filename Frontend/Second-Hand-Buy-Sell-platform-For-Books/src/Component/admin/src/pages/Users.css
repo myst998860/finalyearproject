@@ -1,0 +1,126 @@
+/* Loading spinner animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Smooth transitions for buttons */
+button {
+  transition: all 0.2s ease;
+}
+
+/* Hover effects for action buttons */
+.action-button {
+  transition: all 0.2s ease;
+}
+
+.action-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Notification animations */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.notification-enter {
+  animation: slideIn 0.3s ease-out;
+}
+
+.notification-exit {
+  animation: slideOut 0.3s ease-in;
+}
+
+/* Table row hover effects */
+.user-table-row:hover {
+  background-color: #f9fafb;
+}
+
+/* Status badge animations */
+.status-badge {
+  transition: all 0.2s ease;
+}
+
+.status-badge:hover {
+  transform: scale(1.05);
+}
+
+/* Search input focus effects */
+.search-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Pagination button hover effects */
+.pagination-button:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.pagination-button:active {
+  transform: translateY(1px);
+}
+
+/* Confirmation dialog backdrop blur */
+.dialog-backdrop {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Responsive design improvements */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .filters-container {
+    flex-direction: column;
+  }
+  
+  .search-input {
+    min-width: 100%;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .user-card {
+    background-color: #1f2937;
+    border-color: #374151;
+  }
+  
+  .user-card:hover {
+    background-color: #374151;
+  }
+  
+  .table-header {
+    background-color: #111827;
+  }
+  
+  .table-row {
+    border-bottom-color: #374151;
+  }
+  
+  .table-row:hover {
+    background-color: #1f2937;
+  }
+} 

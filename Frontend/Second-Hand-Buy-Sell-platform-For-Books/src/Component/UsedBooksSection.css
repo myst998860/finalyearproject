@@ -1,0 +1,117 @@
+.used-books-section {
+  background-color: #f0fdf4;
+  padding: 40px 0;
+  border-top: 1px solid #d1fae5;
+  border-bottom: 1px solid #d1fae5;
+  text-align: center;
+}
+
+.used-books-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.used-books-content {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.used-books-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.used-books-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #1a202c;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.used-books-subtitle {
+  font-size: 1.2rem;
+  color: #4a5568;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.used-books-description {
+  font-size: 1rem;
+  color: #718096;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.used-books-cta {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.used-books-button, .explore-books-btn {
+  display: inline-block;
+  padding: 12px 30px;
+  background-color: #10b981;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  border: none;
+  cursor: pointer;
+  margin: 0 auto;
+}
+
+.used-books-button:hover, .explore-books-btn:hover {
+  background-color: #059669;
+}
+
+.bookshelf-container {
+  position: relative;
+  flex-shrink: 0;
+  text-align: center;
+  margin: 0 auto;
+  max-width: 800px;
+}
+
+.bookshelf {
+  width: 600px;
+  height: 20px;
+  background-color: #a0522d;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  bottom: -15px;
+  margin: 0 auto;
+}
+
+.books-on-shelf {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.book-on-shelf {
+  width: 110px;
+  height: auto;
+  margin: 0 -10px;
+  transition: transform 0.3s ease;
+  box-shadow: -5px -5px 15px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.book-on-shelf:hover {
+  transform: translateY(-15px) scale(1.05);
+  z-index: 10;
+} 
