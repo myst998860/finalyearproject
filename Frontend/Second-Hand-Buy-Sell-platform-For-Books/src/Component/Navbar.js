@@ -158,14 +158,15 @@ const Navbar = () => {
           onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
           onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
         />
-        <span className="brand-name">LUNASU</span>
+        <span className="brand-name">LunasuCrochet</span>
       </div>
 
       {/* Middle Navigation */}
       <ul className="nav-links">
         <li onClick={() => handleNavigation('/')} className={location.pathname === '/' ? 'active' : ''}>Home</li>
+        <li onClick={() => handleNavigation('/search')} className={location.pathname === '/search' ? 'active' : ''}>Shop</li>
         <li onClick={() => handleNavigation('/about')} className={location.pathname === '/about' ? 'active' : ''}>About</li>
-        <li onClick={() => handleNavigation('/search')} className={location.pathname === '/search' ? 'active' : ''}>BookStore</li>
+        <li onClick={() => handleNavigation('/contact')} className={location.pathname === '/contact' ? 'active' : ''}>Contact</li>
         {isLoggedIn && userType === 'individual' && (
           <li ref={listBookRef} className="dropdown" onClick={() => setIsModalOpen(!isModalOpen)}>
             List a book <span className="arrow">▼</span>
@@ -213,74 +214,9 @@ const Navbar = () => {
 
       {/* Right Section */}
       <div className="navbar-right">
-        <form onSubmit={handleSearch} className="search-container">
-          <input
-            type="text"
-            placeholder="Search books..."
-            className="search-bar"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={(e) => e.currentTarget.style.width = '250px'}
-            onBlur={(e) => e.currentTarget.style.width = '200px'}
-          />
-        </form>
-        <span className="icon" onClick={() => handleNavigation('/notification')} style={{ position: 'relative' }}>
-          <NotificationIcon />
-          {unreadNotificationCount > 0 && (
-            <span style={{
-              position: 'absolute',
-              top: -5,
-              right: -5,
-              background: '#dc3545',
-              color: '#fff',
-              borderRadius: '50%',
-              width: '18px',
-              height: '18px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '10px',
-              fontWeight: 'bold'
-            }}>
-              {unreadNotificationCount}
-            </span>
-          )}
-        </span>
-        <span className="icon" onClick={() => handleNavigation('/cart')}>
-          <CartIcon />
-        </span>
-        {isLoggedIn && (
-          <div ref={profileRef} className="dropdown" onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}>
-            <span className="icon">
-              <UserProfileIcon />
-            </span>
-            {profileDropdownOpen && (
-              <div ref={profileRef} className="list-book-dropdown">
-                <div className="dropdown-item" onClick={() => handleNavigation('/profile')}>
-                  Profile
-                </div>
-                {userType === 'admin' && (
-                  <div className="dropdown-item" onClick={() => handleNavigation('/admin')}>
-                    Admin Panel
-                  </div>
-                )}
-                <div className="dropdown-item text-red-600" onClick={handleLogout}>
-                  Logout
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-        {!isLoggedIn && (
-          <>
-            <button className="login-btn" onClick={() => handleNavigation('/login')}>
-              Login
-            </button>
-            <button className="signup-btn" onClick={() => handleNavigation('/registration')}>
-              Join Us
-            </button>
-          </>
-        )}
+        <button className="shop-now-btn" onClick={() => handleNavigation('/search')}>
+          Shop Now
+        </button>
       </div>
     </nav>
   );
