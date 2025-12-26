@@ -172,7 +172,7 @@ body, html {
 }
 
 .hero-left {
-  flex: 1;
+  flex: 1.5;
   text-align: left;
   background: #fce7f3;
   padding: 60px 40px;
@@ -193,7 +193,7 @@ body, html {
 .hero-left p {
   font-size: 18px;
   margin-bottom: 40px;
-  color: #374151;
+  color: #6b7280;
   line-height: 1.6;
 }
 
@@ -207,7 +207,7 @@ body, html {
   background-color: #000;
   border: none;
   padding: 12px 30px;
-  border-radius: 6px;
+  border-radius: 8px;
   color: white;
   font-size: 16px;
   font-weight: 600;
@@ -221,9 +221,9 @@ body, html {
 
 .story-button {
   background-color: #fff;
-  border: 2px solid #000;
+  border: 1px solid #d1d5db;
   padding: 12px 30px;
-  border-radius: 6px;
+  border-radius: 8px;
   color: #000;
   font-size: 16px;
   font-weight: 600;
@@ -232,7 +232,8 @@ body, html {
 }
 
 .story-button:hover {
-  background-color: #f3f4f6;
+  background-color: #f9fafb;
+  border-color: #9ca3af;
 }
 
 .hero-right {
@@ -252,7 +253,8 @@ body, html {
   position: absolute;
   bottom: 20px;
   left: 20px;
-  background: white;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
   padding: 12px 16px;
   border-radius: 8px;
   display: flex;
@@ -260,7 +262,7 @@ body, html {
   gap: 8px;
   font-size: 14px;
   font-weight: 500;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #000;
 }
 
 .star-icon {
@@ -586,106 +588,202 @@ body, html {
 
 /* --- Footer Section Styles --- */
 .custom-footer {
-  background: #f0fdf4;
   margin-top: 0;
   padding: 0;
   box-sizing: border-box;
-  text-align: center;
+  width: 100%;
 }
-.footer-info {
+
+/* Newsletter Section in Footer */
+.footer-newsletter-section {
+  background-color: #ec4899;
+  padding: 60px 40px;
+  text-align: center;
+  color: white;
+}
+
+.footer-newsletter-section h2 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: white;
+}
+
+.footer-newsletter-section p {
+  font-size: 16px;
+  margin-bottom: 30px;
+  opacity: 0.95;
+}
+
+.footer-newsletter-form {
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 36px 0 24px 0;
-  gap: 36px;
-  position: relative;
-  max-width: 1200px;
+  gap: 12px;
+  max-width: 500px;
   margin: 0 auto;
 }
-.footer-books-img {
-  width: 220px;
-  height: auto;
-  object-fit: contain;
-  margin-right: 18px;
-  margin-left: 80px;
-}
-.footer-content {
+
+.footer-newsletter-input {
   flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  outline: none;
+  color: #000;
+}
+
+.footer-newsletter-button {
+  background-color: white;
+  color: #ec4899;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.footer-newsletter-button:hover {
+  background-color: #f3f4f6;
+}
+
+/* Footer Black Section */
+.footer-black-section {
+  background-color: #000;
+  color: white;
+  padding: 60px 40px 20px;
+}
+
+.footer-columns {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-bottom: 40px;
+}
+
+.footer-column {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  min-width: 320px;
 }
-.footer-stats {
-  display: flex;
-  gap: 48px;
-  margin: 18px 0 18px 0;
-}
-.footer-stat-number {
-  color: #10b981;
-  font-size: 1.5rem;
+
+.footer-brand-name {
+  font-size: 24px;
   font-weight: 700;
-  text-align: center;
+  margin-bottom: 12px;
+  color: white;
 }
-.footer-stat-label {
-  color: #888;
-  font-size: 1rem;
-  text-align: center;
+
+.footer-brand-description {
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
 }
-.footer-explore-btn {
-  margin-top: 8px;
-  width: 2.5cm;
-  min-width: 0;
-  padding: 8px 0;
-  border-radius: 6px;
-  border: 1.5px solid #10b981;
-  background: #fff;
-  color: #10b981;
-  font-weight: 500;
-  font-size: 1.08rem;
+
+.footer-column-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: white;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  display: block;
-  text-align: center;
-  margin-left: 0;
+  transition: color 0.3s ease;
 }
-.footer-explore-btn:hover {
-  background: #10b981;
-  color: #fff;
+
+.footer-links li:hover {
+  color: white;
 }
-.footer-bar {
-  background: #444;
-  color: #fff;
+
+.footer-contact-info {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-contact-info li {
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.footer-bottom {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 40px;
-  font-size: 1rem;
-  border-top: 2px solid #aaa;
+  padding-top: 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 1200px;
+  margin: 0 auto;
 }
-.footer-branch-msg {
-  text-align: right;
-  flex: 1;
+
+.footer-copyright {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
 }
-@media (max-width: 900px) {
-  .footer-info {
+
+.footer-admin-link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.footer-admin-link:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+/* Responsive Footer */
+@media (max-width: 968px) {
+  .footer-columns {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+  
+  .footer-newsletter-form {
     flex-direction: column;
-    gap: 18px;
-    padding: 24px 0 16px 0;
+    max-width: 100%;
   }
-  .footer-books-img {
-    margin: 0 auto 12px auto;
-    display: block;
-  }
-  .footer-bar {
-    flex-direction: column;
-    gap: 6px;
-    padding: 12px 10px;
-    font-size: 0.95rem;
-  }
-  .footer-content {
-    min-width: 0;
+  
+  .footer-newsletter-button {
     width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .footer-columns {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .footer-black-section {
+    padding: 40px 20px 20px;
+  }
+  
+  .footer-newsletter-section {
+    padding: 40px 20px;
+  }
+  
+  .footer-bottom {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
   }
 }
 .shop-header-center {

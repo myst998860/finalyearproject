@@ -169,12 +169,12 @@ const Navbar = () => {
         <li onClick={() => handleNavigation('/contact')} className={location.pathname === '/contact' ? 'active' : ''}>Contact</li>
         {isLoggedIn && userType === 'individual' && (
           <li ref={listBookRef} className="dropdown" onClick={() => setIsModalOpen(!isModalOpen)}>
-            List a book <span className="arrow">▼</span>
+           Tutorials <span className="arrow">▼</span>
             {isModalOpen && (
               <div ref={modalRef} className="list-book-dropdown">
                 <div className="dropdown-left-panel" onClick={() => handleNavigation('/book-list')}>
                   <div className="panel-content">
-                    <div className="panel-title">List your Book</div>
+                    <div className="panel-title">Tutorials</div>
                     <p className="panel-description">Sell, exchange, or donate your books to fellow readers and organizations.</p>
                   </div>
                 </div>
@@ -214,9 +214,78 @@ const Navbar = () => {
 
       {/* Right Section */}
       <div className="navbar-right">
-        <button className="shop-now-btn" onClick={() => handleNavigation('/search')}>
-          Shop Now
-        </button>
+        {!isLoggedIn ? (
+          <>
+            <button className="login-btn" onClick={() => handleNavigation('/login')}>
+              Login
+            </button>
+            <button className="shop-now-btn" onClick={() => handleNavigation('/search')}>
+              Shop Now
+            </button>
+          </>
+        ) : (
+          <>
+            <form onSubmit={handleSearch} className="search-container">
+              <input
+                type="text"
+                placeholder="Search books..."
+                className="search-bar"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={(e) => e.currentTarget.style.width = '250px'}
+                onBlur={(e) => e.currentTarget.style.width = '200px'}
+              />
+            </form>
+            <span className="icon" onClick={() => handleNavigation('/notification')} style={{ position: 'relative' }}>
+              <NotificationIcon />
+              {unreadNotificationCount > 0 && (
+                <span style={{
+                  position: 'absolute',
+                  top: -5,
+                  right: -5,
+                  background: '#dc3545',
+                  color: '#fff',
+                  borderRadius: '50%',
+                  width: '18px',
+                  height: '18px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '10px',
+                  fontWeight: 'bold'
+                }}>
+                  {unreadNotificationCount}
+                </span>
+              )}
+            </span>
+            <span className="icon" onClick={() => handleNavigation('/cart')}>
+              <CartIcon />
+            </span>
+            <div ref={profileRef} className="dropdown" onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}>
+              <span className="icon">
+                <UserProfileIcon />
+              </span>
+              {profileDropdownOpen && (
+                <div ref={profileRef} className="list-book-dropdown">
+                  <div className="dropdown-item" onClick={() => handleNavigation('/profile')}>
+                    Profile
+                  </div>
+                  {userType === 'admin' && (
+                    <div className="dropdown-item" onClick={() => handleNavigation('/admin')}>
+                      Admin Panel
+                    </div>
+                  )}
+                  <div className="dropdown-item text-red-600" onClick={handleLogout}>
+                    Logout
+                  </div>
+                </div>
+              )}
+            </div>
+            <button className="shop-now-btn" onClick={() => handleNavigation('/search')}>
+              Shop Now
+            </button>
+          </>
+        )}
       </div>
     </nav>
   );

@@ -1,44 +1,77 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
 
-const Footer = () => (
-  <footer className="custom-footer">
-    <div className="footer-info">
-      <img src={require('../Component/assests/footer image.png')} alt="Blue Books" className="footer-books-img" />
-      <div className="footer-content">
-        <h2 style={{ fontWeight: 700, fontSize: '2rem', margin: 0 }}>
-          Your favorite <span style={{ color: '#10b981' }}>Reads</span><br />
-          <span style={{ color: '#10b981' }}>Are Here!</span>
-        </h2>
-        <p style={{ margin: '16px 0 18px 0', fontSize: '1.08rem', color: '#222' }}>
-          Buy your favorite books online with ease! Enjoy exclusive offers and discounts on selected titles. Dive into our collection and find special deals that make reading more affordable. 
-          Shop now and unlock more savings with every purchase!
-        </p>
-        <div className="footer-stats">
-          <div>
-            <div className="footer-stat-number">800+</div>
-            <div className="footer-stat-label">Book Listing</div>
+const Footer = () => {
+  const navigate = useNavigate();
+
+  return (
+    <footer className="custom-footer">
+      {/* Newsletter Section - Pink Background */}
+      <div className="footer-newsletter-section">
+        <h2>Stay Updated</h2>
+        <p>Subscribe to our newsletter for new products, special offers, and crochet tips.</p>
+        <div className="footer-newsletter-form">
+          <input
+            type="email"
+            placeholder="Enter your email"
+            className="footer-newsletter-input"
+          />
+          <button className="footer-newsletter-button">Subscribe</button>
+        </div>
+      </div>
+
+      {/* Footer Content - Black Background */}
+      <div className="footer-black-section">
+        <div className="footer-columns">
+          {/* Column 1 - Brand Info */}
+          <div className="footer-column">
+            <h3 className="footer-brand-name">LunasuCrochet</h3>
+            <p className="footer-brand-description">
+              Handcrafted crochet items made with love and premium materials.
+            </p>
           </div>
-          <div>
-            <div className="footer-stat-number">1K+</div>
-            <div className="footer-stat-label">Registered Members</div>
+
+          {/* Column 2 - Quick Links */}
+          <div className="footer-column">
+            <h3 className="footer-column-title">Quick Links</h3>
+            <ul className="footer-links">
+              <li onClick={() => navigate('/search')}>Shop</li>
+              <li onClick={() => navigate('/about')}>About</li>
+              <li onClick={() => navigate('/contact')}>Contact</li>
+            </ul>
           </div>
-          <div>
-            <div className="footer-stat-number">50+</div>
-            <div className="footer-stat-label">Branch Count</div>
+
+          {/* Column 3 - Customer Service */}
+          <div className="footer-column">
+            <h3 className="footer-column-title">Customer Service</h3>
+            <ul className="footer-links">
+              <li>Shipping Info</li>
+              <li>Returns</li>
+              <li>FAQ</li>
+            </ul>
+          </div>
+
+          {/* Column 4 - Contact Info */}
+          <div className="footer-column">
+            <h3 className="footer-column-title">Contact Info</h3>
+            <ul className="footer-contact-info">
+              <li>Email: hello@lunasucrochet.com</li>
+              <li>Phone: 98100534266</li>
+            </ul>
           </div>
         </div>
-        <button className="footer-explore-btn">Explore</button>
+
+        {/* Copyright and Admin */}
+        <div className="footer-bottom">
+          <span className="footer-copyright">© 2025 LunasuCrochet. All rights reserved.</span>
+          <a href="/admin/login" className="footer-admin-link">
+            Admin Panel
+          </a>
+        </div>
       </div>
-    </div>
-    <div className="footer-bar">
-      <span>© 2024 | <b>Book Bridge</b></span>
-      <span className="footer-branch-msg">Visit our branches in Lalitpur, and register for our online platform to enjoy maximum benefits!</span>
-      <a href="/admin/login" style={{ color: '#2196f3', textDecoration: 'none', fontSize: '0.9rem' }}>
-        Admin Panel
-      </a>
-    </div>
-  </footer>
-);
+    </footer>
+  );
+};
 
 export default Footer;
