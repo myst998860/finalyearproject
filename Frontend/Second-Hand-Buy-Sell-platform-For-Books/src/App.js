@@ -31,6 +31,9 @@ import UsedBooksSection from './Component/UsedBooksSection'
 import { CartProvider } from './Component/CartContext'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import Contact from './Component/Contact'
+import AdminPanel from './Component/aadmin/Adminpanel'
+import OrganizationOrder from './Component/aadmin/Order'
 
 // Admin Components
 import AdminLogin from './Component/admin/src/pages/Login'
@@ -93,6 +96,9 @@ function App() {
             <Route path="/order-history" element={<OrderHistory />} />
             <Route path="/new-collection" element={<NewCollection />} />
             <Route path="/used-books" element={<UsedBooksSection />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/adminpanel" element={<AdminPanel />} />
+            <Route path="/organization-orders" element={<OrganizationOrder />} />
 
             {/* 404 Route - Catch all undefined routes */}
             <Route path="*" element={<div style={{ padding: '20px', textAlign: 'center' }}>

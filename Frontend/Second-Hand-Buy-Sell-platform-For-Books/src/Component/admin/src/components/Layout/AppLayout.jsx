@@ -21,7 +21,7 @@ export default function AppLayout() {
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Users', href: '/admin/users', icon: Users },
-    { name: 'Books', href: '/admin/books', icon: BookOpen },
+    { name: 'Products', href: '/admin/books', icon: BookOpen },
     { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
     { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
   ];

@@ -1,89 +1,32 @@
 import React from "react";
-import Navbar from './Navbar';
-import Footer from './Footer';
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 import "./Aboutus.css";
 
 const AboutUs = () => {
   return (
-    <div className="aboutus-container">
+    <div className="about-page">
       <Navbar />
 
       {/* Hero Section */}
-      <section className="aboutus-hero">
-        <div className="hero-overlay"></div>
-        <div className="hero-content">
-          <h1 className="hero-title">
-            Connecting Readers, 
-            <span className="hero-highlight"> One Book at a Time</span>
-          </h1>
-          <p className="hero-subtitle">
-            A community-driven platform where stories find new homes and knowledge flows freely
-          </p>
-        </div>
-      </section>
-
-      {/* Mission Section */}
-      <section className="mission-section">
-        <div className="container">
-          <div className="section-header">
-            <h2 className="section-title">Our Mission</h2>
-            <p className="section-subtitle">
-              We're on a mission to make books accessible, affordable, and sustainable for everyone
+      <section className="about-hero">
+        <div className="about-hero-inner container">
+          <div className="about-hero-text">
+            <p className="eyebrow">Our Story of</p>
+            <h1>
+              <span className="hero-title-main">lunasu</span>
+            </h1>
+            <p className="hero-description">
+              Founded in 2024, Lunasu began as a passion project in a small
+              home studio. Today, we are a community of artisans dedicated to creating beautiful, handmade crochet items that bring joy families worldwide.
+             
             </p>
+            <button className="primary-btn">Shop Our Collection</button>
           </div>
-          
-          <div className="mission-cards">
-            <div className="mission-card">
-              <div className="card-icon">📚</div>
-              <h3>Accessibility</h3>
-              <p>Making quality books available to everyone, regardless of their budget or location</p>
-            </div>
-            <div className="mission-card">
-              <div className="card-icon">🌱</div>
-              <h3>Sustainability</h3>
-              <p>Promoting environmental consciousness through book reuse and recycling</p>
-            </div>
-            <div className="mission-card">
-              <div className="card-icon">❤️</div>
-              <h3>Community</h3>
-              <p>Building a supportive network of readers, learners, and book enthusiasts</p>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Story Section */}
-      <section className="story-section">
-        <div className="container">
-          <div className="story-content">
-            <div className="story-text">
-              <h2>Our Story</h2>
-              <p>
-                Book Bridge was born from a simple observation: too many books were gathering dust on shelves while others struggled to find affordable reading material. We realized that every book has the potential to inspire, educate, and connect people across different walks of life.
-              </p>
-              <p>
-                What started as a small community initiative has grown into a vibrant platform where students swap textbooks, families share children's books, and generous donors provide reading materials to those in need. Our community spans from individual readers to educational institutions, all united by a love for books and learning.
-              </p>
-              <div className="story-stats">
-                <div className="stat-item">
-                  <span className="stat-number">800+</span>
-                  <span className="stat-label">Books Listed</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-number">1K+</span>
-                  <span className="stat-label">Active Members</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-number">50+</span>
-                  <span className="stat-label">Partner Locations</span>
-                </div>
-              </div>
-            </div>
-            <div className="story-image">
-              <img 
-                src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
-                alt="Books and Community" 
-              />
+          <div className="about-hero-card">
+            <div className="hero-card-inner">
+              <span className="hero-image-placeholder"></span>
             </div>
           </div>
         </div>
@@ -92,81 +35,137 @@ const AboutUs = () => {
       {/* Values Section */}
       <section className="values-section">
         <div className="container">
-          <div className="section-header">
-            <h2 className="section-title">Our Values</h2>
-            <p className="section-subtitle">
-              The principles that guide everything we do
+          <div className="section-heading">
+            <h2>Our Values</h2>
+            <p>
+              Every exchange is guided by our core values of accessibility,
+              sustainability, and community.
             </p>
           </div>
-          
-          <div className="values-grid">
-            <div className="value-item">
+
+          <div className="values-row">
+            <div className="value-card">
+              <div className="value-icon">❤️</div>
+              <h3>Made with Love</h3>
+              <p>
+                Every listing is carefully reviewed so that each book feels
+                special for its next reader.
+              </p>
+            </div>
+            <div className="value-card">
+              <div className="value-icon">⭐</div>
+              <h3>Premium Quality</h3>
+              <p>
+                We encourage honest condition ratings so books arrive exactly as
+                expected.
+              </p>
+            </div>
+            <div className="value-card">
               <div className="value-icon">🤝</div>
-              <h3>Trust</h3>
-              <p>Building reliable connections between book owners and seekers</p>
-            </div>
-            <div className="value-item">
-              <div className="value-icon">♻️</div>
-              <h3>Sustainability</h3>
-              <p>Reducing waste by giving books multiple lives</p>
-            </div>
-            <div className="value-item">
-              <div className="value-icon">🎓</div>
-              <h3>Education</h3>
-              <p>Supporting lifelong learning and knowledge sharing</p>
-            </div>
-            <div className="value-item">
-              <div className="value-icon">🌟</div>
-              <h3>Inclusivity</h3>
-              <p>Making reading accessible to everyone</p>
+              <h3>Community Focused</h3>
+              <p>
+                We connect readers, donors, and institutions through
+                book-sharing initiatives and drives.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Impact Section */}
-      <section className="impact-section">
+      {/* Team Section */}
+      <section className="team-section">
         <div className="container">
-          <div className="impact-content">
-            <div className="impact-text">
-              <h2>Our Impact</h2>
-              <p>
-                Since our launch, we've facilitated thousands of book exchanges, helping students save money on textbooks, families discover new stories, and communities build stronger connections through shared reading experiences.
+          <div className="section-heading">
+            <h2>Meet Our Team</h2>
+            <p>The people working behind the scenes to keep BookBridge alive.</p>
+          </div>
+
+          <div className="team-row">
+            <div className="team-card">
+              <div className="team-avatar"></div>
+              <h3>Sarah Johnson</h3>
+              <p className="team-role">Founder &amp; Lead Designer</p>
+              <p className="team-bio">
+                Started BookBridge to make quality reading accessible to every
+                student on campus.
               </p>
-              <div className="impact-highlights">
-                <div className="highlight-item">
-                  <span className="highlight-number">5000+</span>
-                  <span className="highlight-text">Books Exchanged</span>
-                </div>
-                <div className="highlight-item">
-                  <span className="highlight-number">2000+</span>
-                  <span className="highlight-text">Students Helped</span>
-                </div>
-                <div className="highlight-item">
-                  <span className="highlight-number">100+</span>
-                  <span className="highlight-text">Schools Supported</span>
-                </div>
-              </div>
             </div>
-            <div className="impact-image">
-              <img 
-                src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
-                alt="Reading Impact" 
-              />
+            <div className="team-card">
+              <div className="team-avatar"></div>
+              <h3>Emily Chen</h3>
+              <p className="team-role">Product Lead</p>
+              <p className="team-bio">
+                Crafts seamless user experiences so it&apos;s easy to buy, sell,
+                or donate books.
+              </p>
+            </div>
+            <div className="team-card">
+              <div className="team-avatar"></div>
+              <h3>Maria Rodriguez</h3>
+              <p className="team-role">Community Specialist</p>
+              <p className="team-bio">
+                Builds partnerships with libraries, NGOs, and student
+                communities.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Process Section */}
+      <section className="process-section">
+        <div className="container">
+          <div className="section-heading">
+            <h2>Our Process</h2>
+            <p>
+              From listing to delivery, every step is designed to be simple,
+              transparent, and secure.
+            </p>
+          </div>
+
+          <div className="process-row">
+            <div className="process-step">
+              <div className="process-icon">✏️</div>
+              <h3>List</h3>
+              <p>Upload your pre-loved books with clear photos and details.</p>
+            </div>
+            <div className="process-step">
+              <div className="process-icon">📦</div>
+              <h3>Match</h3>
+              <p>
+                Buyers discover the right book through search, filters, and
+                smart suggestions.
+              </p>
+            </div>
+            <div className="process-step">
+              <div className="process-icon">✅</div>
+              <h3>Quality Check</h3>
+              <p>Conditions are verified to ensure what you see is what you get.</p>
+            </div>
+            <div className="process-step">
+              <div className="process-icon">🚚</div>
+              <h3>Deliver</h3>
+              <p>
+                Books are handed over or shipped with care so they reach safely
+                and on time.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="cta-section">
+      <section className="about-cta">
         <div className="container">
-          <div className="cta-content">
-            <h2>Join Our Community</h2>
-            <p>Be part of a movement that's making reading accessible to everyone</p>
-            <div className="cta-buttons">
-              <button className="cta-btn primary">Start Sharing Books</button>
-              <button className="cta-btn secondary">Learn More</button>
+          <div className="about-cta-inner">
+            <h2>Ready to Experience BookBridge?</h2>
+            <p>
+              Explore thousands of pre-loved books or give your own collection a
+              second life.
+            </p>
+            <div className="cta-actions">
+              <button className="primary-btn light">Shop Now</button>
+              <button className="secondary-btn light">Contact Us</button>
             </div>
           </div>
         </div>

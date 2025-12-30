@@ -23,7 +23,12 @@ const Login = () => {
       }));
       toast.success('Login successful!');
       setTimeout(() => {
-        window.location.href = '/search';
+        // Redirect organizations to admin panel, others to search page
+        if (data.user.userType?.toLowerCase() === 'organization') {
+          window.location.href = '/adminpanel';
+        } else {
+          window.location.href = '/search';
+        }
       }, 1200);
     } catch (error) {
       toast.error(error.message || 'Login failed. Please check your credentials.');
@@ -58,37 +63,39 @@ const Login = () => {
           overflow: 'hidden'
         }}>
           
-          {/* Left Side - Green */}
+          {/* Left Side - Pink */}
           <div style={{
             width: '400px',
-            background: 'linear-gradient(160deg, #059669 0%, #10b981 100%)',
+            background: 'linear-gradient(160deg, #fce7f3 0%, #fce7f3 100%)',
             padding: '50px 40px',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            color: 'white',
+            color: 'black',
             textAlign: 'center'
           }}>
-            <div style={{ fontSize: '64px', marginBottom: '20px' }}>📚</div>
-            <h1 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '15px', color: 'white' }}>
-              Book Bridge
+            <div style={{ fontSize: '64px', marginBottom: '20px' }}></div>
+            <h1 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '15px', color: 'black' }}>
+              Lunasu Crochet
             </h1>
-            <p style={{ fontSize: '16px', opacity: '0.9', lineHeight: '1.6', marginBottom: '30px' }}>
-              Connect with book lovers. Buy, sell, and exchange your favorite reads.
+            <p style={{ fontSize: '16px', color: '#333', lineHeight: '1.6', marginBottom: '30px' }}>
+
+             Welcome Back
+             Sign in to your account to continue shopping
             </p>
             <div style={{ textAlign: 'left', width: '100%', paddingLeft: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                <span style={{ background: 'rgba(255,255,255,0.2)', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}>✓</span>
-                <span>Thousands of books available</span>
+                <span style={{ background: 'rgba(0,0,0,0.1)', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', color: 'black' }}>✓</span>
+                <span style={{ color: 'black' }}>Thousands of product available</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                <span style={{ background: 'rgba(255,255,255,0.2)', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}>✓</span>
-                <span>Safe & secure transactions</span>
+                <span style={{ background: 'rgba(0,0,0,0.1)', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', color: 'black' }}>✓</span>
+                <span style={{ color: 'black' }}>Safe & secure transactions</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ background: 'rgba(255,255,255,0.2)', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}>✓</span>
-                <span>Connect with local readers</span>
+                <span style={{ background: 'rgba(0,0,0,0.1)', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', color: 'black' }}>✓</span>
+                <span style={{ color: 'black' }}>Connect with local artisans</span>
               </div>
             </div>
           </div>
@@ -148,7 +155,7 @@ const Login = () => {
               </Form.Item>
 
               <div style={{ textAlign: 'right', marginBottom: '20px' }}>
-                <a href="/forget-password" style={{ color: '#10b981', fontWeight: '600' }}>
+                <a href="/forget-password" style={{ color: '#ec4899', fontWeight: '600' }}>
                   Forgot Password?
                 </a>
               </div>
@@ -163,9 +170,9 @@ const Login = () => {
                   fontSize: '16px',
                   fontWeight: '600',
                   borderRadius: '8px',
-                  background: '#10b981',
+                  background: '#0e0f0fff',
                   border: 'none',
-                  boxShadow: '0 4px 12px rgba(16,185,129,0.3)'
+                  boxShadow: '0 4px 12px rgba(8, 8, 8, 0.3)'
                 }}
               >
                 Sign In
@@ -173,7 +180,7 @@ const Login = () => {
 
               <div style={{ textAlign: 'center', marginTop: '25px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
                 <span style={{ color: '#666' }}>Don't have an account? </span>
-                <a href="/signup" style={{ color: '#10b981', fontWeight: '600' }}>Create Account</a>
+                <a href="/signup" style={{ color: ' #ec4899', fontWeight: '600' }}>Create Account</a>
               </div>
             </Form>
           </div>

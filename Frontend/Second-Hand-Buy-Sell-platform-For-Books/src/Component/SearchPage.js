@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import './SearchPage.css';
+import './HomePage.css';
 import { fetchBooks, getImageUrl } from '../services/api';
 
 const suggestions = [
@@ -26,7 +27,34 @@ const SearchPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
-  const booksPerPage = 8;
+  const [selectedCategory, setSelectedCategory] = useState('All Products');
+  const [selectedPriceRange, setSelectedPriceRange] = useState([]);
+  const [sortBy, setSortBy] = useState('Featured');
+  const booksPerPage = 12;
+
+  const categories = [
+    'All Products',
+    'Blankets',
+    'Toys',
+    'Accessories',
+    'Home Decor',
+    'Baby Items'
+  ];
+
+  const priceRanges = [
+    { label: 'Under $20', value: 'under-20' },
+    { label: '$20 - $40', value: '20-40' },
+    { label: '$40 - $60', value: '40-60' },
+    { label: 'Over $60', value: 'over-60' }
+  ];
+
+  const handlePriceRangeChange = (value) => {
+    setSelectedPriceRange(prev => 
+      prev.includes(value) 
+        ? prev.filter(p => p !== value)
+        : [...prev, value]
+    );
+  };
 
   // Calculate paginated books
   const indexOfLastBook = currentPage * booksPerPage;
@@ -103,89 +131,147 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="search-page">
+    <div className="search-page shop-page">
       <Navbar />
-      <div className="search-content">
-        <div className="search-hero">
-          <h1>Find Your Perfect Book</h1>
-          <p>Search for books by title, author, genre, or keyword. Discover a world of stories and knowledge!</p>
-          <form className="search-form" onSubmit={handleSearch}>
-            <div className="search-input-container">
-              <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Search for books, authors, or genres..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-              />
-              <button className="search-button" type="submit" disabled={loading}>Search</button>
-            </div>
-          </form>
-            <div className="search-suggestions">
-              <h3>Popular Searches</h3>
-              <div className="suggestion-tags">
-              {suggestions.map(s => (
-                <span key={s} onClick={() => handleSuggestionClick(s)}>{s}</span>
-                ))}
-              </div>
-            </div>
+      <main className="shop-main-container">
+        {/* Breadcrumbs */}
+        <div className="shop-breadcrumbs">
+          <span className="breadcrumb-icon">🏠</span>
+          <span onClick={() => navigate('/')} className="breadcrumb-link">Home</span>
+          <span className="breadcrumb-separator"> &gt; </span>
+          <span className="breadcrumb-current">Shop</span>
         </div>
-      </div>
-      <main>
-        {loading ? (
-          <div className="no-results"><h3>Loading books...</h3></div>
-        ) : filteredBooks.length === 0 ? (
-          <div className="no-results">
-            <h3>No books found</h3>
-            <p>Try a different search or browse popular categories above.</p>
-          </div>
-        ) : (
-          <>
-          <div className="book-grid">
-            {paginatedBooks.map(book => (
-              <div key={book.id} className="book-card-item">
-                <img src={getImageUrl(book.bookImage)} alt={book.title} className="book-card-image" />
-                <div className="book-card-content">
-                  <h3 className="book-card-title">{book.title}</h3>
-                  <p className="book-card-author">{book.author}</p>
-                  <p className="book-card-description">{book.description}</p>
-                  <div className="book-card-footer">
-                    <p className="book-card-price">Rs. {book.price}</p>
-                    <button className="purchase-btn" onClick={() => handleViewDetails(book)}>View Details</button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="pagination-controls">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                  key={i + 1}
-                  className={currentPage === i + 1 ? 'active' : ''}
-                  onClick={() => handlePageChange(i + 1)}
-                >
-                  {i + 1}
-                </button>
-              ))}
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </button>
+
+        {/* Page Title and Subtitle */}
+        <div className="shop-page-header">
+          <h1 className="shop-page-title">Our Collection</h1>
+          <p className="shop-page-subtitle">Discover beautiful handcrafted crochet items</p>
+        </div>
+
+        {/* Main Content with Sidebar */}
+        <div className="shop-content-wrapper">
+          {/* Left Sidebar - Categories */}
+          <aside className="shop-sidebar">
+            <div className="sidebar-categories-card">
+              <h2 className="sidebar-categories-title">Categories</h2>
+              <ul className="sidebar-categories-list">
+                {categories.map((category) => (
+                  <li
+                    key={category}
+                    className={`sidebar-category-item ${selectedCategory === category ? 'active' : ''}`}
+                    onClick={() => setSelectedCategory(category)}
+                  >
+                    {category}
+                  </li>
+                ))}
+              </ul>
             </div>
-          )}
-          </>
-        )}
+
+            {/* Price Range Filter */}
+            <div className="sidebar-price-range-card">
+              <h2 className="sidebar-categories-title">Price Range</h2>
+              <ul className="sidebar-price-range-list">
+                {priceRanges.map((range) => (
+                  <li key={range.value} className="sidebar-price-range-item">
+                    <label className="price-range-label">
+                      <input
+                        type="checkbox"
+                        checked={selectedPriceRange.includes(range.value)}
+                        onChange={() => handlePriceRangeChange(range.value)}
+                        className="price-range-checkbox"
+                      />
+                      <span>{range.label}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </aside>
+
+          {/* Right Main Content */}
+          <div className="shop-main-content">
+            {/* Results Header with Sort */}
+            <div className="shop-results-header">
+              <span className="showing-products-text">
+                Showing {filteredBooks.length} products
+              </span>
+              <div className="shop-sort-container">
+                <span className="sort-label">Sort by:</span>
+                <select 
+                  className="sort-dropdown"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <option value="Featured">Featured</option>
+                  <option value="Price Low to High">Price Low to High</option>
+                  <option value="Price High to Low">Price High to Low</option>
+                  <option value="Newest">Newest</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Book Grid */}
+            {loading ? (
+              <div className="no-results"><h3>Loading...</h3></div>
+            ) : filteredBooks.length === 0 ? (
+              <div className="no-results">
+                <h3>No match found</h3>
+                <p>Try a different search or browse popular categories above.</p>
+              </div>
+            ) : (
+              <>
+                <div className="book-grid">
+                  {paginatedBooks.map((book, idx) => (
+                    <div className="book-card" key={book.id || idx}>
+                      <div className="product-image-placeholder">
+                        <img src={getImageUrl(book.bookImage)} alt={book.title} className="book-image" />
+                      </div>
+                      <h3>{book.title}</h3>
+                      <div className="star-rating">
+                        <span className="star">⭐</span>
+                        <span className="star">⭐</span>
+                        <span className="star">⭐</span>
+                        <span className="star">⭐</span>
+                        <span className="star">⭐</span>
+                      </div>
+                      <p className="price">NRP. {book.price}/-</p>
+                      <button className="details-button" onClick={() => handleViewDetails(book)}>View Detail</button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="pagination-controls">
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="pagination-btn"
+                    >
+                      Previous
+                    </button>
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <button
+                        key={i + 1}
+                        className={`pagination-btn ${currentPage === i + 1 ? 'active' : ''}`}
+                        onClick={() => handlePageChange(i + 1)}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="pagination-btn"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
       </main>
       <Footer />
     </div>

@@ -143,7 +143,7 @@ const ViewDetails = () => {
               border: '1px solid #ffeaa7',
               fontSize: '14px'
             }}>
-              ⚠️ This is your own book. You cannot purchase it.
+              {/* ⚠️ This is your own book. You cannot purchase it. */}
             </div>
           )}
           
@@ -168,7 +168,7 @@ const ViewDetails = () => {
                 cursor: isOwnBookFlag ? 'not-allowed' : 'pointer'
               }}
             >
-              Buy Books
+              Buy product
             </button>
           </div>
         </div>

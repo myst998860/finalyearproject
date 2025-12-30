@@ -282,8 +282,8 @@ const Signup = () => {
           font-size: 1.2rem;
         }
         .login-button {
-          background-color: #28a745;
-          border-color: #28a745;
+          background-color: #ec4899;
+          border-color: #ec4899;
           height: 40px;
           border-radius: 8px;
           font-size: 0.9rem;
@@ -292,8 +292,8 @@ const Signup = () => {
           margin-left: 10px;
         }
         .login-button:hover {
-          background-color: #218838;
-          border-color: #1e7e34;
+          background-color: #ec4899;
+          border-color: #ec4899;
         }
       `}</style>
     </div>

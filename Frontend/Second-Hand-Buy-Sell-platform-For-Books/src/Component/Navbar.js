@@ -147,7 +147,7 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       {/* Left Logo */}
-      <div className="navbar-left" onClick={() => handleNavigation('/')}
+      {/* <div className="navbar-left" onClick={() => handleNavigation('/')}
         onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
         onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
       >
@@ -157,9 +157,9 @@ const Navbar = () => {
           className="logo" 
           onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
           onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-        />
+        /> */}
         <span className="brand-name">LunasuCrochet</span>
-      </div>
+      {/* </div> */}
 
       {/* Middle Navigation */}
       <ul className="nav-links">
@@ -169,19 +169,19 @@ const Navbar = () => {
         <li onClick={() => handleNavigation('/contact')} className={location.pathname === '/contact' ? 'active' : ''}>Contact</li>
         {isLoggedIn && userType === 'individual' && (
           <li ref={listBookRef} className="dropdown" onClick={() => setIsModalOpen(!isModalOpen)}>
-            List a book <span className="arrow">▼</span>
+            List a product<span className="arrow">▼</span>
             {isModalOpen && (
               <div ref={modalRef} className="list-book-dropdown">
                 <div className="dropdown-left-panel" onClick={() => handleNavigation('/book-list')}>
                   <div className="panel-content">
-                    <div className="panel-title">List your Book</div>
-                    <p className="panel-description">Sell, exchange, or donate your books to fellow readers and organizations.</p>
+                    <div className="panel-title">List your Product</div>
+                    <p className="panel-description">Sell to fellow customers.</p>
                   </div>
                 </div>
                 <div className="dropdown-right-panel">
                   <div className="right-panel-item" onClick={() => handleNavigation('/book-sell')}>
-                    <div className="right-panel-title">Sell a Book</div>
-                    <div className="right-panel-subtitle">List your book for sale and earn money</div>
+                    <div className="right-panel-title">Sell a product</div>
+                    <div className="right-panel-subtitle">List your product for sale and earn money</div>
                   </div>
                   {/*
                   <div className="right-panel-item" onClick={() => handleNavigation('/book-exchange')}>
@@ -204,7 +204,7 @@ const Navbar = () => {
             {orgDropdownOpen && (
               <div ref={orgDropdownRef} className="org-dropdown">
                 <div className="dropdown-item" onClick={() => handleNavigation('/request-book')}>
-                  Request Books
+                  Request 
                 </div>
               </div>
             )}
@@ -215,9 +215,17 @@ const Navbar = () => {
       {/* Right Section */}
       <div className="navbar-right">
         {!isLoggedIn ? (
-          <button className="shop-now-btn" onClick={() => handleNavigation('/search')}>
-            Shop Now
-          </button>
+          <>
+            <span className="icon" onClick={() => handleNavigation('/notification')} style={{ position: 'relative' }}>
+              <NotificationIcon />
+            </span>
+            <button className="login-btn" onClick={() => handleNavigation('/login')}>
+              Login
+            </button>
+            <button className="shop-now-btn" onClick={() => handleNavigation('/search')}>
+              Shop Now
+            </button>
+          </>
         ) : (
           <>
             <form onSubmit={handleSearch} className="search-container">

@@ -118,7 +118,7 @@ export default function AdminBooks() {
     return (
       <div className="loading-container">
         <div className="loading-spinner"></div>
-        <div className="loading-text">Loading books...</div>
+        <div className="loading-text">Loading...</div>
       </div>
     );
   }
@@ -128,7 +128,7 @@ export default function AdminBooks() {
       <div className="error-container">
         <XCircle size={24} color="#dc2626" />
         <div className="error-text">
-          <div className="error-title">Error loading books</div>
+          <div className="error-title">Error loading </div>
           <div className="error-message">{error.message}</div>
         </div>
       </div>
@@ -139,7 +139,7 @@ export default function AdminBooks() {
     <div className="books-container">
       {/* Header */}
       <div className="books-header">
-        <h1 className="books-title">Book Management</h1>
+        <h1 className="books-title"> Management</h1>
         <p className="books-subtitle">Manage all books on the BookBridge platform</p>
       </div>
 

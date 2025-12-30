@@ -55,7 +55,7 @@ export default function Dashboard() {
           Dashboard
         </h1>
         <p style={{ color: '#6b7280', margin: 0 }}>
-          Overview of your BookBridge platform
+          Overview of your platform
         </p>
         <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
           Last updated: {new Date().toLocaleTimeString()}
@@ -69,7 +69,7 @@ export default function Dashboard() {
         gap: '20px',
         marginBottom: '32px'
       }}>
-        <div style={{
+        {/* <div style={{
           background: 'white',
           padding: '24px',
           borderRadius: '12px',
@@ -100,7 +100,7 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div style={{
           background: 'white',

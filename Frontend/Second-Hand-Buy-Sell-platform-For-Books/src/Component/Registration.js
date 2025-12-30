@@ -83,11 +83,11 @@ const Registration = () => {
     <div>
       <Navbar />
       <div style={{ maxWidth: 500, margin: '0 auto', padding: 20 }}>
-        <Title level={3} style={{ textAlign: 'center', color: '#1ABC9C' }}>
-          Welcome to Book Bridge!
+        <Title level={3} style={{ textAlign: 'center', color: '#ec4899' }}>
+         Create Your Account
         </Title>
         <Text style={{ display: 'block', textAlign: 'center', marginBottom: 10 }}>
-          Choose your account type and fill in the details below.
+Join our community of crochet lovers and get exclusive access to new products and special offers
         </Text>
 
         <Tabs defaultActiveKey="individual" onChange={onTabChange} centered>
@@ -95,7 +95,7 @@ const Registration = () => {
           <TabPane tab="Organization" key="organization" />
         </Tabs>
 
-        <Form
+        <Form 
           form={form}
           layout="vertical"
           onFinish={onFinish}
@@ -230,7 +230,7 @@ const Registration = () => {
               htmlType="submit"
               block
               loading={loading}
-              style={{ backgroundColor: '#1ABC9C', borderColor: '#1ABC9C' }}
+              style={{ backgroundColor: '#070606ff', borderColor: '#090909ff' }}
             >
               Register
             </Button>
@@ -239,7 +239,7 @@ const Registration = () => {
 
         <div style={{ textAlign: 'center' }}>
           <Text>Have an account? </Text>
-          <Link href="#" style={{ color: '#1ABC9C' }}>
+          <Link href="#" style={{ color: '#ec4899' }}>
             Sign in
           </Link>
         </div>
