@@ -118,6 +118,9 @@ const AdminPanel = () => {
             <span className="admin-badge">Organization Panel</span>
           </div>
           <div className="admin-header-actions">
+            <button className="admin-orders-btn" onClick={() => navigate('/organization-products')}>
+              View Products
+            </button>
             <button className="admin-orders-btn" onClick={() => navigate('/organization-orders')}>
               View Orders
             </button>

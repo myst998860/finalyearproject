@@ -34,6 +34,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import Contact from './Component/Contact'
 import AdminPanel from './Component/aadmin/Adminpanel'
 import OrganizationOrder from './Component/aadmin/Order'
+import Product from './Component/aadmin/Product'
 
 // Admin Components
 import AdminLogin from './Component/admin/src/pages/Login'
@@ -99,6 +100,7 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/adminpanel" element={<AdminPanel />} />
             <Route path="/organization-orders" element={<OrganizationOrder />} />
+            <Route path="/organization-products" element={<Product />} />
 
             {/* 404 Route - Catch all undefined routes */}
             <Route path="*" element={<div style={{ padding: '20px', textAlign: 'center' }}>
