@@ -35,6 +35,7 @@ import Contact from './Component/Contact'
 import AdminPanel from './Component/aadmin/Adminpanel'
 import OrganizationOrder from './Component/aadmin/Order'
 import Product from './Component/aadmin/Product'
+import Analytics from './Component/aadmin/Analytics'
 
 // Admin Components
 import AdminLogin from './Component/admin/src/pages/Login'
@@ -101,6 +102,7 @@ function App() {
             <Route path="/adminpanel" element={<AdminPanel />} />
             <Route path="/organization-orders" element={<OrganizationOrder />} />
             <Route path="/organization-products" element={<Product />} />
+            <Route path="/organization-analytics" element={<Analytics />} />
 
             {/* 404 Route - Catch all undefined routes */}
             <Route path="*" element={<div style={{ padding: '20px', textAlign: 'center' }}>

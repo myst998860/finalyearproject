@@ -124,6 +124,9 @@ const AdminPanel = () => {
             <button className="admin-orders-btn" onClick={() => navigate('/organization-orders')}>
               View Orders
             </button>
+            <button className="admin-orders-btn" onClick={() => navigate('/organization-analytics')}>
+              Analytics
+            </button>
             <span className="admin-user-name">{user.fullName || user.email}</span>
             <button className="admin-logout-btn" onClick={handleLogout}>
               Logout
