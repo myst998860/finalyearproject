@@ -749,8 +749,10 @@ public class AdminController {
                     }
                     // Check if user exists and is admin
                     Optional<User> userOpt = userService.getUserByEmail(email);
-                    if (userOpt.isPresent() && userOpt.get().getUserType() == User.UserType.ADMIN) {
-                        return true;
+                    if (userOpt.isPresent()) {
+                        User user = userOpt.get();
+                        return user.getUserType() == User.UserType.ADMIN || 
+                               user.getUserType() == User.UserType.ORGANIZATION; // Add this line
                     }
                 }
             } catch (Exception e) {

@@ -16,10 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.HashMap;
 
 @Service
 public class OrderService {
+	
+	
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
@@ -39,6 +42,81 @@ public class OrderService {
         this.notificationService = notificationService;
     }
 
+    public Long countOrdersByOrganization(Long organizationId) {
+        List<Order> allOrders = orderRepository.findAll();
+        
+        return allOrders.stream()
+            .filter(order -> {
+                // Check if any book in this order belongs to the organization
+                return order.getOrderItems().stream()
+                    .anyMatch(orderItem -> {
+                        Book book = orderItem.getBook();
+                        return book != null && 
+                               book.getUser() != null && 
+                               book.getUser().getId().equals(organizationId);
+                    });
+            })
+            .count();
+    }
+
+    public Long countOrdersByOrganizationAfterDate(Long organizationId, LocalDateTime date) {
+        List<Order> allOrders = orderRepository.findAll();
+        
+        return allOrders.stream()
+            .filter(order -> {
+                // Check date first
+                if (order.getCreatedAt().isBefore(date)) {
+                    return false;
+                }
+                
+                // Check if any book in this order belongs to the organization
+                return order.getOrderItems().stream()
+                    .anyMatch(orderItem -> {
+                        Book book = orderItem.getBook();
+                        return book != null && 
+                               book.getUser() != null && 
+                               book.getUser().getId().equals(organizationId);
+                    });
+            })
+            .count();
+    }
+
+    public List<Order> getOrdersByOrganization(Long organizationId) {
+        List<Order> allOrders = orderRepository.findAll();
+        
+        return allOrders.stream()
+            .filter(order -> {
+                return order.getOrderItems().stream()
+                    .anyMatch(orderItem -> {
+                        Book book = orderItem.getBook();
+                        return book != null && 
+                               book.getUser() != null && 
+                               book.getUser().getId().equals(organizationId);
+                    });
+            })
+            .collect(Collectors.toList());
+    }
+
+    public List<Order> getOrdersByOrganizationAfterDate(Long organizationId, LocalDateTime date) {
+        List<Order> allOrders = orderRepository.findAll();
+        
+        return allOrders.stream()
+            .filter(order -> {
+                if (order.getCreatedAt().isBefore(date)) {
+                    return false;
+                }
+                
+                return order.getOrderItems().stream()
+                    .anyMatch(orderItem -> {
+                        Book book = orderItem.getBook();
+                        return book != null && 
+                               book.getUser() != null && 
+                               book.getUser().getId().equals(organizationId);
+                    });
+            })
+            .collect(Collectors.toList());
+    }
+    
     public List<Order> getAllOrders() {
         try {
         return orderRepository.findAll();

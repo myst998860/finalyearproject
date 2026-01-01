@@ -642,7 +642,7 @@ export const getUpworkTransactions = async () => {
 // Analytics API functions
 export const getOrderAnalytics = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/admin/analytics/orders`, {
+    const response = await fetch(`${BASE_URL}/aadmin/admin/analytics/orders`, {
       credentials: 'include'
     });
     

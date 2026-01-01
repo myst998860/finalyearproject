@@ -41,11 +41,11 @@ const Analytics = () => {
     const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
     const userType = storedUser.userType?.toLowerCase();
     
-    if (!storedUser.token || userType !== 'organization') {
-      toast.error('Access denied. Organization login required.');
-      navigate('/login');
-      return;
-    }
+    if (!storedUser.token || (userType !== 'admin' && userType !== 'organization')) {
+    toast.error('Access denied. Admin or Organization login required.');
+    navigate('/login');
+    return;
+  }
     
     setUser(storedUser);
   }, [navigate]);
@@ -53,7 +53,7 @@ const Analytics = () => {
   // Fetch analytics data with organization token
   const fetchDashboardStats = async () => {
     const headers = getAuthHeaders();
-    const response = await fetch('http://localhost:8082/api/admin/dashboard', {
+    const response = await fetch('http://localhost:8082/api/aadmin/dashboard', {
       headers: headers,
       credentials: 'include'
     });

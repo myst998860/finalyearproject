@@ -167,6 +167,8 @@ const Navbar = () => {
         <li onClick={() => handleNavigation('/search')} className={location.pathname === '/search' ? 'active' : ''}>Shop</li>
         <li onClick={() => handleNavigation('/about')} className={location.pathname === '/about' ? 'active' : ''}>About</li>
         <li onClick={() => handleNavigation('/contact')} className={location.pathname === '/contact' ? 'active' : ''}>Contact</li>
+           <li onClick={() => handleNavigation('/tutorial')} className={location.pathname === '/contact' ? 'active' : ''}>Tutorial Video</li>
+
         {isLoggedIn && userType === 'individual' && (
           <li ref={listBookRef} className="dropdown" onClick={() => setIsModalOpen(!isModalOpen)}>
             List a product<span className="arrow">▼</span>

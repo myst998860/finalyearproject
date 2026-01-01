@@ -28,6 +28,7 @@ import ChangePassword from './Component/ChangePassword'
 import OrderHistory from './Component/OrderHistory'
 import NewCollection from './Component/NewCollection'
 import UsedBooksSection from './Component/UsedBooksSection'
+import Tutorial from './Component/Tutorial'
 import { CartProvider } from './Component/CartContext'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -71,6 +72,7 @@ function App() {
             <Route path="/about" element={<Aboutus />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/books" element={<Booklist />} />
+            <Route path="/tutorial" element={<Tutorial />} />
             <Route path="/books-cloudinary" element={<BooklistWithCloudinary />} />
             <Route path="/sell" element={<BookSell />} />
             <Route path="/book-sell" element={<BookSell />} />

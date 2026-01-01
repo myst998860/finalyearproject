@@ -15,6 +15,12 @@ import java.util.Optional;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
+	
+	// OrderService interface
+	Long countOrdersByOrganization(Long organizationId);
+	Long countOrdersByOrganizationAfterDate(Long organizationId, LocalDateTime date);
+	List<Order> getOrdersByOrganization(Long organizationId);
+	List<Order> getOrdersByOrganizationAfterDate(Long organizationId, LocalDateTime date);
     
     List<Order> findByUserOrderByCreatedAtDesc(User user);
     

@@ -35,12 +35,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("JwtAuthenticationFilter: Processing request to " + request.getRequestURI());
         System.out.println("JwtAuthenticationFilter: Authorization header = " + authHeader);
 
-        // Check for admin session authentication first
+        // Check for admin session authentication first - BUT DON'T RETURN EARLY
         if (request.getRequestURI().startsWith("/api/admin/") && 
             !request.getRequestURI().equals("/api/admin/login") && 
             !request.getRequestURI().equals("/api/admin/setup") &&
             !request.getRequestURI().equals("/api/admin/test-session") &&
             !request.getRequestURI().equals("/api/admin/test-auth")) {
+            
             HttpSession session = request.getSession(false);
             if (session != null) {
                 Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
@@ -52,8 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         "admin", null, java.util.Collections.emptyList());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    filterChain.doFilter(request, response);
-                    return;
+                    // DON'T RETURN HERE - let JWT processing continue too
                 } else {
                     System.out.println("JwtAuthenticationFilter: No valid admin session found");
                 }
@@ -62,6 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
+        // ALWAYS process JWT if present
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwt = authHeader.substring(7);
             try {
@@ -70,8 +71,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             } catch (Exception e) {
                 System.out.println("JwtAuthenticationFilter: Invalid token");
             }
-        } else {
-            System.out.println("JwtAuthenticationFilter: No Bearer token found, allowing request to continue");
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -85,10 +84,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             } else {
                 System.out.println("JwtAuthenticationFilter: Token invalid for " + username);
             }
+        } else if (username != null) {
+            System.out.println("JwtAuthenticationFilter: Authentication already set, skipping JWT auth");
         } else {
             System.out.println("JwtAuthenticationFilter: No authentication set, allowing anonymous access");
         }
         
+        // ALWAYS continue the filter chain
         filterChain.doFilter(request, response);
     }
 } 
