@@ -95,4 +95,15 @@ public class FileStorageService {
         int dotIndex = fileName.lastIndexOf('.');
         return (dotIndex == -1) ? "" : fileName.substring(dotIndex);
     }
+    
+    public String storeVideo(MultipartFile video) throws IOException {
+        // Save in a separate folder "videos" (optional)
+        return storeFile(video, "videos");
+    }
+
+    public String storeImage(MultipartFile image) throws IOException {
+        // Save in a separate folder "images" (optional)
+        return storeFile(image, "images");
+    }
+    
 }

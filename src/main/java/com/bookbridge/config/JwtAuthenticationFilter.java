@@ -28,19 +28,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        
+        String requestURI = request.getRequestURI();
         final String authHeader = request.getHeader("Authorization");
         String username = null;
         String jwt = null;
 
-        System.out.println("JwtAuthenticationFilter: Processing request to " + request.getRequestURI());
+        System.out.println("JwtAuthenticationFilter: Processing request to " + requestURI);
         System.out.println("JwtAuthenticationFilter: Authorization header = " + authHeader);
 
-        // Check for admin session authentication first - BUT DON'T RETURN EARLY
-        if (request.getRequestURI().startsWith("/api/admin/") && 
-            !request.getRequestURI().equals("/api/admin/login") && 
-            !request.getRequestURI().equals("/api/admin/setup") &&
-            !request.getRequestURI().equals("/api/admin/test-session") &&
-            !request.getRequestURI().equals("/api/admin/test-auth")) {
+        // ========== CRITICAL FIX: SKIP JWT FOR PUBLIC TUTORIAL ENDPOINTS ==========
+        // Check if this is a public GET request to tutorials
+        if (requestURI.startsWith("/api/tutorials/") && request.getMethod().equals("GET")) {
+            System.out.println("JwtAuthenticationFilter: Skipping JWT check for public tutorial GET request");
+            filterChain.doFilter(request, response);
+            return; // Skip JWT processing entirely
+        }
+
+        // Check for admin session authentication first
+        if (requestURI.startsWith("/api/admin/") && 
+            !requestURI.equals("/api/admin/login") && 
+            !requestURI.equals("/api/admin/setup") &&
+            !requestURI.equals("/api/admin/test-session") &&
+            !requestURI.equals("/api/admin/test-auth")) {
             
             HttpSession session = request.getSession(false);
             if (session != null) {
@@ -48,12 +58,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Long adminId = (Long) session.getAttribute("adminId");
                 if (isAdmin != null && isAdmin && adminId != null) {
                     System.out.println("JwtAuthenticationFilter: Admin session found for admin ID: " + adminId);
-                    // Create a simple admin authentication
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         "admin", null, java.util.Collections.emptyList());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    // DON'T RETURN HERE - let JWT processing continue too
                 } else {
                     System.out.println("JwtAuthenticationFilter: No valid admin session found");
                 }
@@ -62,35 +70,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        // ALWAYS process JWT if present
+        // Process JWT if present (for non-public endpoints)
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwt = authHeader.substring(7);
             try {
                 username = jwtUtil.extractUsername(jwt);
                 System.out.println("JwtAuthenticationFilter: Extracted username = " + username);
             } catch (Exception e) {
-                System.out.println("JwtAuthenticationFilter: Invalid token");
+                System.out.println("JwtAuthenticationFilter: Invalid token: " + e.getMessage());
+                // Don't throw error, just continue without authentication
             }
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
-                System.out.println("JwtAuthenticationFilter: Token valid, setting authentication for " + username);
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            } else {
-                System.out.println("JwtAuthenticationFilter: Token invalid for " + username);
+            try {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
+                    System.out.println("JwtAuthenticationFilter: Token valid, setting authentication for " + username);
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                } else {
+                    System.out.println("JwtAuthenticationFilter: Token invalid for " + username);
+                }
+            } catch (Exception e) {
+                System.out.println("JwtAuthenticationFilter: Error loading user details: " + e.getMessage());
+                // Continue without authentication
             }
-        } else if (username != null) {
-            System.out.println("JwtAuthenticationFilter: Authentication already set, skipping JWT auth");
-        } else {
-            System.out.println("JwtAuthenticationFilter: No authentication set, allowing anonymous access");
         }
         
-        // ALWAYS continue the filter chain
+        System.out.println("JwtAuthenticationFilter: Continuing filter chain");
         filterChain.doFilter(request, response);
     }
-} 
+}

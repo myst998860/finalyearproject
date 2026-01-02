@@ -37,7 +37,7 @@ public class SecurityConfig {
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
         configuration.setExposedHeaders(Arrays.asList("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
-        configuration.setMaxAge(3600L); // Cache preflight for 1 hour
+        configuration.setMaxAge(3600L);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -53,20 +53,44 @@ public class SecurityConfig {
                 .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED)
             )
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(HttpMethod.GET, "/books/**").permitAll() // allow file serving first
-                .requestMatchers(HttpMethod.GET, "/api/files/**").permitAll() // allow file serving first
-                .requestMatchers(HttpMethod.GET, "/api/books", "/api/books/**").permitAll() // legacy public GET
-                .requestMatchers(HttpMethod.GET, "/api/v1/books", "/api/v1/books/**").permitAll() // new versioned books GET
+                // ========== PUBLIC ENDPOINTS ==========
+                // Books and files (read-only)
+                .requestMatchers(HttpMethod.GET, "/books/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/files/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/books", "/api/books/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/books", "/api/v1/books/**").permitAll()
+                
+                // Auth endpoints
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/login", "/api/register/**", "/api/password/reset", "/api/password/reset/complete").permitAll()
-                .requestMatchers("/api/admin/**").permitAll() // Allow all admin endpoints - authentication handled manually
-                .requestMatchers("/api/cart/**").authenticated() // Allow cart endpoints for authenticated users
-                .requestMatchers("/api/orders/**").authenticated() // Allow orders endpoints for authenticated users
+                .requestMatchers("/api/login", "/api/register/**", "/api/password/reset/**").permitAll()
+                
+                // Admin endpoints (they handle auth internally)
+                .requestMatchers("/api/admin/**").permitAll()
+                
+                // ========== TUTORIAL ENDPOINTS ==========
+                // All GET requests to tutorials are public
+                .requestMatchers(HttpMethod.GET, "/api/tutorials/**").permitAll()
+                
+                // ========== AUTHENTICATED ENDPOINTS ==========
+                // Tutorial write operations
+                .requestMatchers(HttpMethod.POST, "/api/tutorials/**").authenticated()
+                .requestMatchers(HttpMethod.PUT, "/api/tutorials/**").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/tutorials/**").authenticated()
+                
+                // Other authenticated endpoints
+                .requestMatchers("/api/cart/**").authenticated()
+                .requestMatchers("/api/orders/**").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/books").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/books/request").authenticated()
+                
+                
+                .requestMatchers(HttpMethod.GET, "/api/tutorials/**").permitAll()
+                .requestMatchers("/api/organization/**").hasRole("ORGANIZATION")
+                // ========== CATCH-ALL ==========
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
+        
         return http.build();
     }
 }

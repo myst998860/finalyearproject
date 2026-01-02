@@ -741,4 +741,44 @@ export const updateUpworkTransactionStatus = async (transactionId, status) => {
     console.error('Update transaction status error:', error);
     throw error;
   }
+  
 };
+
+// Helper to handle fetch response
+
+
+export const fetchTutorials = async () => {
+  const response = await fetch(`${BASE_URL}/tutorials`);
+  return handleResponse(response);
+};
+
+// ===================== ORGANIZATION =====================
+// Upload tutorial (organization)
+export const uploadTutorial = async (formData, token) => {
+  try {
+    const response = await fetch(`${BASE_URL}/organization/tutorials`, {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // Do NOT set Content-Type! Let the browser set it to multipart/form-data
+      },
+    });
+
+    // Handle special case for 413 Payload Too Large
+    if (response.status === 413) {
+      throw new Error(
+        "File too large. Please upload a smaller video or increase server upload limit."
+      );
+    }
+
+    // Handle other bad requests
+    return handleResponse(response);
+  } catch (err) {
+    // Provide a default fallback
+    if (!err.message) err.message = "Upload failed due to network or server error";
+    throw err;
+  }
+};
+
+// Get all published tutorials

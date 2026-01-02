@@ -37,6 +37,8 @@ import AdminPanel from './Component/aadmin/Adminpanel'
 import OrganizationOrder from './Component/aadmin/Order'
 import Product from './Component/aadmin/Product'
 import Analytics from './Component/aadmin/Analytics'
+import TutorialAdd from './Component/aadmin/TutorialAdd';
+
 
 // Admin Components
 import AdminLogin from './Component/admin/src/pages/Login'
@@ -47,6 +49,7 @@ import AdminBooks from './Component/admin/src/pages/Books'
 import AdminOrders from './Component/admin/src/pages/Orders'
 import AdminAnalytics from './Component/admin/src/pages/Analytics'
 import AdminProtectedRoute from './Component/admin/src/components/AdminProtectedRoute'
+
 
 // Create a QueryClient instance
 const queryClient = new QueryClient({
@@ -105,6 +108,10 @@ function App() {
             <Route path="/organization-orders" element={<OrganizationOrder />} />
             <Route path="/organization-products" element={<Product />} />
             <Route path="/organization-analytics" element={<Analytics />} />
+        <Route path="/organization-tutorials-add" element={<TutorialAdd />} />
+
+
+      
 
             {/* 404 Route - Catch all undefined routes */}
             <Route path="*" element={<div style={{ padding: '20px', textAlign: 'center' }}>
@@ -125,6 +132,7 @@ function App() {
               <Route path="books" element={<AdminBooks />} />
               <Route path="orders" element={<AdminOrders />} />
               <Route path="analytics" element={<AdminAnalytics />} />
+          
               <Route path="payments" element={<div style={{ padding: '20px' }}>Payments Management - Coming Soon</div>} />
               <Route path="reports" element={<div style={{ padding: '20px' }}>Reports - Coming Soon</div>} />
               <Route path="settings" element={<div style={{ padding: '20px' }}>Settings - Coming Soon</div>} />

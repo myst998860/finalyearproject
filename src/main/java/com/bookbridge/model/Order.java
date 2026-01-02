@@ -28,6 +28,8 @@ public class Order {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "orders", "books", "sentMessages", "receivedMessages"})
     private User user;
 
+    
+    
     @NotNull
     @DecimalMin(value = "0.0")
     @Column(name = "total_amount", precision = 10, scale = 2)
