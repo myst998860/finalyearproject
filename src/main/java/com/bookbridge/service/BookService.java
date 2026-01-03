@@ -47,7 +47,7 @@ public class BookService {
             throw new RuntimeException("Failed to retrieve book with ID: " + id, e);
         }
     }
-    
+
     public Optional<Book> getBookByIdIncludingDeleted(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("Book ID cannot be null");
@@ -69,7 +69,7 @@ public class BookService {
             throw new RuntimeException("Failed to retrieve books for user: " + user.getId(), e);
         }
     }
-    
+
     public List<Book> getAllBooksByUserIncludingDeleted(User user) {
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");
@@ -201,9 +201,9 @@ public class BookService {
         }
     }
 
-    public Page<Book> searchBooksWithFilters(String keyword, Book.BookCategory category, 
-                                           Book.BookCondition condition, Book.ListingType listingType, 
-                                           String location, Pageable pageable) {
+    public Page<Book> searchBooksWithFilters(String keyword, Book.BookCategory category,
+            Book.BookCondition condition, Book.ListingType listingType,
+            String location, Pageable pageable) {
         try {
             return bookRepository.searchBooksWithFilters(keyword, category, condition, listingType, location, pageable);
         } catch (Exception e) {
@@ -286,6 +286,14 @@ public class BookService {
             return bookRepository.countBooksByStatus(status);
         } catch (Exception e) {
             throw new RuntimeException("Failed to count books by status: " + status, e);
+        }
+    }
+
+    public Long countAllBooksNotDeleted() {
+        try {
+            return bookRepository.countAllBooksNotDeleted();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to count all non-deleted books", e);
         }
     }
 }

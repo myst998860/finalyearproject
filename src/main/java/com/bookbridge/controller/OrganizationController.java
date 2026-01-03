@@ -2,8 +2,6 @@ package com.bookbridge.controller;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -33,35 +31,35 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/api/organization")
 public class OrganizationController {
-    
+
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private BookService bookService;
-    
+
     @Autowired
     private OrderService orderService;
-    
+
     @Autowired
     private FileStorageService fileStorageService;
-  
+
     @Autowired
     private CloudinaryService cloudinaryService;
-    
+
     @Autowired
     private TutorialRepository tutorialRepository;
-    
+
     @Autowired
     private JwtUtil jwtUtil;
-    
+
     private boolean isOrganizationAuthenticated(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             try {
                 String token = authHeader.substring(7);
                 String email = jwtUtil.extractUsername(token);
-                
+
                 if (email != null && !jwtUtil.extractExpiration(token).before(new java.util.Date())) {
                     Optional<User> userOpt = userService.getUserByEmail(email);
                     if (userOpt.isPresent()) {
@@ -75,47 +73,41 @@ public class OrganizationController {
         }
         return false;
     }
-    
+
     @GetMapping("/analytics/orders")
     public ResponseEntity<?> getOrderAnalytics(HttpServletRequest request) {
         if (!isOrganizationAuthenticated(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Organization authentication required"));
         }
-        
+
         try {
-            // For now, use the same global analytics
-            // This will compile since we're using existing methods
-            
-            LocalDateTime now = LocalDateTime.now();
-            LocalDateTime startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
-            LocalDateTime startOfYear = now.withDayOfYear(1).withHour(0).withMinute(0).withSecond(0);
-            
-            Map<String, Object> analytics = new HashMap<>();
-            
-            // Use existing global methods
-            analytics.put("totalOrders", orderService.countAllOrders());
-            analytics.put("ordersThisMonth", orderService.countOrdersCreatedAfter(startOfMonth));
-            analytics.put("ordersThisYear", orderService.countOrdersCreatedAfter(startOfYear));
-            
-            // ... rest of the analytics
+            String authHeader = request.getHeader("Authorization");
+            String token = authHeader.substring(7);
+            String email = jwtUtil.extractUsername(token);
+
+            Optional<User> userOpt = userService.getUserByEmail(email);
+            if (!userOpt.isPresent()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("message", "User not found"));
+            }
+
+            Map<String, Object> analytics = orderService.getUserOrderAnalytics(userOpt.get());
             return ResponseEntity.ok(analytics);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Error fetching order analytics: " + e.getMessage()));
         }
     }
-    
-    
-    @PostMapping(value="/tutorials", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+
+    @PostMapping(value = "/tutorials", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadTutorial(
             @RequestParam String title,
             @RequestParam String description,
             @RequestParam BigDecimal price,
             @RequestParam MultipartFile video,
             @RequestParam(required = false) MultipartFile thumbnail,
-            HttpServletRequest request
-    ) {
+            HttpServletRequest request) {
         try {
             String authHeader = request.getHeader("Authorization");
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -137,7 +129,7 @@ public class OrganizationController {
                         .body(Map.of("message", "Invalid price"));
             }
 
-         // Upload video to Cloudinary
+            // Upload video to Cloudinary
             String videoPath = cloudinaryService.uploadVideo(video, "bookbridge/tutorial_videos");
 
             // Upload thumbnail to Cloudinary (if provided)
@@ -164,5 +156,5 @@ public class OrganizationController {
                     .body(Map.of("message", "Upload failed: " + e.getMessage()));
         }
     }
-    
+
 }
