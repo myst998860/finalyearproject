@@ -38,10 +38,10 @@ public class BookController {
 
     @Autowired
     private BookService bookService;
-    
+
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private FileStorageService fileStorageService;
 
@@ -56,10 +56,9 @@ public class BookController {
             @RequestParam(required = false) String condition,
             @RequestParam(required = false) String listingType,
             @RequestParam(required = false) String location) {
-        
+
         try {
-            Sort sort = sortDir.equalsIgnoreCase("desc") ? 
-                Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+            Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
             Pageable pageable = PageRequest.of(page, size, sort);
             Page<Book> books;
 
@@ -92,13 +91,12 @@ public class BookController {
 
             if (keyword != null || category != null || condition != null || listingType != null || location != null) {
                 books = bookService.searchBooksWithFilters(
-                    keyword != null ? keyword : "",
-                    bookCategory,
-                    bookCondition,
-                    bookListingType,
-                    location != null ? location : "",
-                    pageable
-                );
+                        keyword != null ? keyword : "",
+                        bookCategory,
+                        bookCondition,
+                        bookListingType,
+                        location != null ? location : "",
+                        pageable);
             } else {
                 books = bookService.getAvailableBooks(pageable);
             }
@@ -136,7 +134,7 @@ public class BookController {
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "bookImage", required = false) MultipartFile bookImage,
             HttpServletRequest request) {
-        
+
         try {
             // Get current user from Spring Security context
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -144,16 +142,16 @@ public class BookController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("message", "Not authenticated"));
             }
-            
+
             String userEmail = authentication.getName();
             Optional<User> userOpt = userService.getUserByEmail(userEmail);
             if (!userOpt.isPresent()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("message", "User not found"));
             }
-            
+
             User user = userOpt.get();
-            
+
             // Create book
             Book book = new Book();
             book.setTitle(title);
@@ -166,25 +164,28 @@ public class BookController {
             book.setIsbn(isbn);
             book.setDescription(description);
             book.setUser(user);
-            
-            // Set price if listing type is SELL
-            if (book.getListingType() == Book.ListingType.SELL && price != null) {
-                book.setPrice(new BigDecimal(price));
+
+            // Set price if provided
+            if (price != null && !price.trim().isEmpty()) {
+                try {
+                    book.setPrice(new BigDecimal(price.trim()));
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid price format received: " + price);
+                }
             }
-            
+
             // Store book image if provided
             if (bookImage != null && !bookImage.isEmpty()) {
                 String imagePath = fileStorageService.storeBookImage(bookImage);
                 book.setBookImage(imagePath);
             }
-            
+
             Book savedBook = bookService.createBook(book);
-            
+
             return ResponseEntity.ok(Map.of(
-                "message", "Book created successfully",
-                "book", savedBook
-            ));
-            
+                    "message", "Book created successfully",
+                    "book", savedBook));
+
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to upload book image"));
@@ -198,7 +199,7 @@ public class BookController {
     public ResponseEntity<?> uploadBooksFromCSV(
             @RequestParam("file") MultipartFile file,
             HttpServletRequest request) {
-        
+
         try {
             // Get current user from Spring Security context
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -206,49 +207,49 @@ public class BookController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("message", "Not authenticated"));
             }
-            
+
             String userEmail = authentication.getName();
             Optional<User> userOpt = userService.getUserByEmail(userEmail);
             if (!userOpt.isPresent()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("message", "User not found"));
             }
-            
+
             User user = userOpt.get();
-            
+
             // Validate file
             if (file == null || file.isEmpty()) {
                 return ResponseEntity.badRequest()
                         .body(Map.of("message", "CSV file is required"));
             }
-            
+
             String filename = file.getOriginalFilename();
             if (filename == null || !filename.toLowerCase().endsWith(".csv")) {
                 return ResponseEntity.badRequest()
                         .body(Map.of("message", "File must be a CSV file"));
             }
-            
+
             // Parse CSV and create books
             List<Book> createdBooks = new ArrayList<>();
             List<String> errors = new ArrayList<>();
-            
+
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-                 CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.builder()
-                        .setHeader()
-                        .setSkipHeaderRecord(true)
-                        .setIgnoreHeaderCase(true)
-                        .setTrim(true)
-                        .build())) {
-                
+                    CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.builder()
+                            .setHeader()
+                            .setSkipHeaderRecord(true)
+                            .setIgnoreHeaderCase(true)
+                            .setTrim(true)
+                            .build())) {
+
                 List<CSVRecord> records = csvParser.getRecords();
-                
+
                 if (records.isEmpty()) {
                     return ResponseEntity.badRequest()
                             .body(Map.of("message", "CSV file is empty or has no data rows"));
                 }
-                
+
                 int rowNumber = 1; // Start from 1 (header is row 0, first data row is 1)
-                
+
                 for (CSVRecord record : records) {
                     rowNumber++;
                     try {
@@ -259,7 +260,7 @@ public class BookController {
                         String condition = record.get("condition");
                         String listingType = record.get("listingType");
                         String location = record.get("location");
-                        
+
                         if (title == null || title.trim().isEmpty()) {
                             errors.add("Row " + rowNumber + ": title is required");
                             continue;
@@ -284,45 +285,46 @@ public class BookController {
                             errors.add("Row " + rowNumber + ": location is required");
                             continue;
                         }
-                        
+
                         // Create book
                         Book book = new Book();
                         book.setTitle(title.trim());
                         book.setAuthor(author.trim());
-                        
+
                         // Parse enums
                         try {
                             book.setCategory(Book.BookCategory.valueOf(category.trim().toUpperCase()));
                         } catch (IllegalArgumentException e) {
-                            errors.add("Row " + rowNumber + ": Invalid category '" + category + "'. Valid values: " + 
+                            errors.add("Row " + rowNumber + ": Invalid category '" + category + "'. Valid values: " +
                                     Arrays.stream(Book.BookCategory.values())
                                             .map(Enum::name)
                                             .collect(Collectors.joining(", ")));
                             continue;
                         }
-                        
+
                         try {
                             book.setCondition(Book.BookCondition.valueOf(condition.trim().toUpperCase()));
                         } catch (IllegalArgumentException e) {
-                            errors.add("Row " + rowNumber + ": Invalid condition '" + condition + "'. Valid values: " + 
+                            errors.add("Row " + rowNumber + ": Invalid condition '" + condition + "'. Valid values: " +
                                     Arrays.stream(Book.BookCondition.values())
                                             .map(Enum::name)
                                             .collect(Collectors.joining(", ")));
                             continue;
                         }
-                        
+
                         try {
                             book.setListingType(Book.ListingType.valueOf(listingType.trim().toUpperCase()));
                         } catch (IllegalArgumentException e) {
-                            errors.add("Row " + rowNumber + ": Invalid listingType '" + listingType + "'. Valid values: " + 
-                                    Arrays.stream(Book.ListingType.values())
-                                            .map(Enum::name)
-                                            .collect(Collectors.joining(", ")));
+                            errors.add(
+                                    "Row " + rowNumber + ": Invalid listingType '" + listingType + "'. Valid values: " +
+                                            Arrays.stream(Book.ListingType.values())
+                                                    .map(Enum::name)
+                                                    .collect(Collectors.joining(", ")));
                             continue;
                         }
-                        
+
                         book.setLocation(location.trim());
-                        
+
                         // Optional fields
                         try {
                             String edition = record.get("edition");
@@ -332,7 +334,7 @@ public class BookController {
                         } catch (IllegalArgumentException e) {
                             // Column doesn't exist, skip
                         }
-                        
+
                         try {
                             String isbn = record.get("isbn");
                             if (isbn != null && !isbn.trim().isEmpty()) {
@@ -341,7 +343,7 @@ public class BookController {
                         } catch (IllegalArgumentException e) {
                             // Column doesn't exist, skip
                         }
-                        
+
                         try {
                             String description = record.get("description");
                             if (description != null && !description.trim().isEmpty()) {
@@ -350,52 +352,50 @@ public class BookController {
                         } catch (IllegalArgumentException e) {
                             // Column doesn't exist, skip
                         }
-                        
+
                         try {
                             String price = record.get("price");
                             if (price != null && !price.trim().isEmpty()) {
-                                if (book.getListingType() == Book.ListingType.SELL) {
-                                    try {
-                                        book.setPrice(new BigDecimal(price.trim()));
-                                    } catch (NumberFormatException e) {
-                                        errors.add("Row " + rowNumber + ": Invalid price format '" + price + "'");
-                                        continue;
-                                    }
+                                try {
+                                    book.setPrice(new BigDecimal(price.trim()));
+                                } catch (NumberFormatException e) {
+                                    errors.add("Row " + rowNumber + ": Invalid price format '" + price + "'");
+                                    continue;
                                 }
                             }
                         } catch (IllegalArgumentException e) {
                             // Column doesn't exist, skip
                         }
-                        
+
                         book.setUser(user);
                         book.setStatus(Book.BookStatus.AVAILABLE);
-                        
+
                         Book savedBook = bookService.createBook(book);
                         createdBooks.add(savedBook);
-                        
+
                     } catch (Exception e) {
                         errors.add("Row " + rowNumber + ": " + e.getMessage());
                     }
                 }
             }
-            
+
             // Prepare response
             Map<String, Object> response = new java.util.HashMap<>();
             response.put("message", "CSV upload completed");
             response.put("successCount", createdBooks.size());
             response.put("errorCount", errors.size());
             response.put("createdBooks", createdBooks);
-            
+
             if (!errors.isEmpty()) {
                 response.put("errors", errors);
             }
-            
+
             if (createdBooks.isEmpty() && !errors.isEmpty()) {
                 return ResponseEntity.badRequest().body(response);
             }
-            
+
             return ResponseEntity.ok(response);
-            
+
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to read CSV file: " + e.getMessage()));
@@ -420,7 +420,7 @@ public class BookController {
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "bookImage", required = false) MultipartFile bookImage,
             HttpServletRequest request) {
-        
+
         try {
             // Get current user from Spring Security context
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -428,30 +428,30 @@ public class BookController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("message", "Not authenticated"));
             }
-            
+
             String userEmail = authentication.getName();
             Optional<User> userOpt = userService.getUserByEmail(userEmail);
             if (!userOpt.isPresent()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("message", "User not found"));
             }
-            
+
             User currentUser = userOpt.get();
             Long userId = currentUser.getId();
             Optional<Book> bookOpt = bookService.getBookById(id);
-            
+
             if (!bookOpt.isPresent()) {
                 return ResponseEntity.notFound().build();
             }
-            
+
             Book book = bookOpt.get();
-            
+
             // Check if user owns this book
             if (!book.getUser().getId().equals(userId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("message", "You can only edit your own books"));
             }
-            
+
             // Update book details
             book.setTitle(title);
             book.setAuthor(author);
@@ -462,14 +462,18 @@ public class BookController {
             book.setEdition(edition);
             book.setIsbn(isbn);
             book.setDescription(description);
-            
-            // Set price if listing type is SELL
-            if (book.getListingType() == Book.ListingType.SELL && price != null) {
-                book.setPrice(new BigDecimal(price));
+
+            // Update price if provided
+            if (price != null && !price.trim().isEmpty()) {
+                try {
+                    book.setPrice(new BigDecimal(price.trim()));
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid price format received during update: " + price);
+                }
             } else {
                 book.setPrice(null);
             }
-            
+
             // Update book image if provided
             if (bookImage != null && !bookImage.isEmpty()) {
                 // Delete old image if exists
@@ -479,14 +483,13 @@ public class BookController {
                 String imagePath = fileStorageService.storeBookImage(bookImage);
                 book.setBookImage(imagePath);
             }
-            
+
             Book updatedBook = bookService.updateBook(book);
-            
+
             return ResponseEntity.ok(Map.of(
-                "message", "Book updated successfully",
-                "book", updatedBook
-            ));
-            
+                    "message", "Book updated successfully",
+                    "book", updatedBook));
+
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to upload book image"));
@@ -505,30 +508,30 @@ public class BookController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("message", "Not authenticated"));
             }
-            
+
             String userEmail = authentication.getName();
             Optional<User> userOpt = userService.getUserByEmail(userEmail);
             if (!userOpt.isPresent()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("message", "User not found"));
             }
-            
+
             User currentUser = userOpt.get();
             Long userId = currentUser.getId();
             Optional<Book> bookOpt = bookService.getBookById(id);
-            
+
             if (!bookOpt.isPresent()) {
                 return ResponseEntity.notFound().build();
             }
-            
+
             Book book = bookOpt.get();
-            
+
             // Check if user owns this book
             if (!book.getUser().getId().equals(userId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("message", "You can only delete your own books"));
             }
-            
+
             boolean deleted = bookService.deleteBook(id);
             if (deleted) {
                 return ResponseEntity.ok(Map.of("message", "Book deleted successfully"));
@@ -536,7 +539,7 @@ public class BookController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(Map.of("message", "Failed to delete book"));
             }
-            
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Error deleting book: " + e.getMessage()));
@@ -550,10 +553,10 @@ public class BookController {
             if (user == null) {
                 return ResponseEntity.notFound().build();
             }
-            
+
             List<Book> books = bookService.getBooksByUser(user);
             return ResponseEntity.ok(books);
-            
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Error fetching user books: " + e.getMessage()));
@@ -569,17 +572,17 @@ public class BookController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("message", "Not authenticated"));
             }
-            
+
             String userEmail = authentication.getName();
             Optional<User> userOpt = userService.getUserByEmail(userEmail);
             if (!userOpt.isPresent()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("message", "User not found"));
             }
-            
+
             List<Book> books = bookService.getBooksByUser(userOpt.get());
             return ResponseEntity.ok(books);
-            
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Error fetching user books: " + e.getMessage()));

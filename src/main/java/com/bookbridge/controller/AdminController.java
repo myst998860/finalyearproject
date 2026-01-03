@@ -129,54 +129,11 @@ public class AdminController {
         try {
             User currentUser = getAuthenticatedUser(request);
 
-            // If organization, return organization-specific dashboard stats
             if (currentUser != null && currentUser.getUserType() == User.UserType.ORGANIZATION) {
-                Map<String, Object> orgStats = orderService.getOrganizationDashboardStats(currentUser);
-                return ResponseEntity.ok(orgStats);
+                return ResponseEntity.ok(orderService.getOrganizationDashboardStats(currentUser));
             }
 
-            // Default Admin behavior (global stats)
-            LocalDateTime lastMonth = LocalDateTime.now().minusMonths(1);
-            LocalDateTime lastWeek = LocalDateTime.now().minusWeeks(1);
-
-            Map<String, Object> stats = new HashMap<>();
-
-            // User statistics
-            List<User> allUsers = userService.getAllUsers();
-            stats.put("totalUsers", allUsers.size());
-            stats.put("newUsersThisMonth", userService.countUsersCreatedAfter(lastMonth));
-            stats.put("activeUsers", allUsers.stream().filter(u -> u.getStatus() == User.UserStatus.ACTIVE).count());
-
-            // Book statistics
-            stats.put("totalBooks", bookService.countAllBooksNotDeleted());
-            stats.put("newBooksThisMonth", bookService.countBooksCreatedAfter(lastMonth));
-            stats.put("soldBooks", bookService.countBooksByStatus(Book.BookStatus.SOLD));
-
-            // Order statistics
-            stats.put("totalOrders", orderService.countAllOrders());
-            stats.put("newOrdersThisWeek", orderService.countOrdersCreatedAfter(lastWeek));
-            stats.put("pendingOrders", orderService.countOrdersByStatus(Order.OrderStatus.PENDING));
-
-            // Payment statistics
-            stats.put("totalPayments", paymentService.countAllPayments());
-            BigDecimal orderRevenue = orderService.sumTotalRevenue();
-            Double upworkRevenue = upworkTransactionService.sumCompletedTransactions();
-
-            double totalRevenueTotal = (orderRevenue != null ? orderRevenue.doubleValue() : 0.0)
-                    + (upworkRevenue != null ? upworkRevenue : 0.0);
-            stats.put("totalRevenue", totalRevenueTotal);
-            stats.put("orderRevenue", orderRevenue != null ? orderRevenue.doubleValue() : 0.0);
-            stats.put("upworkRevenue", upworkRevenue != null ? upworkRevenue : 0.0);
-
-            // Simplified revenue this month for now
-            stats.put("revenueThisMonth",
-                    paymentService.sumSuccessfulPaymentsBetweenDates(lastMonth, LocalDateTime.now()));
-
-            // Upwork transactions (legacy key if needed)
-            stats.put("upworkTransactions", upworkRevenue);
-
-            return ResponseEntity.ok(stats);
-
+            return ResponseEntity.ok(orderService.getGlobalDashboardStats());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Error fetching dashboard stats: " + e.getMessage()));
@@ -348,35 +305,9 @@ public class AdminController {
         try {
             User currentUser = getAuthenticatedUser(request);
             if (currentUser != null && currentUser.getUserType() == User.UserType.ORGANIZATION) {
-                // Return organization-specific analytics (simplified for now to match frontend
-                // expected structure)
-                return ResponseEntity.ok(orderService.getOrganizationDashboardStats(currentUser));
+                return ResponseEntity.ok(orderService.getOrganizationOrderAnalytics(currentUser));
             }
-
-            LocalDateTime now = LocalDateTime.now();
-            LocalDateTime startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
-            LocalDateTime startOfYear = now.withDayOfYear(1).withHour(0).withMinute(0).withSecond(0);
-
-            Map<String, Object> analytics = new HashMap<>();
-
-            // Order statistics
-            analytics.put("totalOrders", orderService.countAllOrders());
-            analytics.put("ordersThisMonth", orderService.countOrdersCreatedAfter(startOfMonth));
-            analytics.put("ordersThisYear", orderService.countOrdersCreatedAfter(startOfYear));
-
-            // Order status breakdown
-            analytics.put("pendingOrders", orderService.countOrdersByStatus(Order.OrderStatus.PENDING));
-            analytics.put("processingOrders", orderService.countOrdersByStatus(Order.OrderStatus.PROCESSING));
-            analytics.put("shippedOrders", orderService.countOrdersByStatus(Order.OrderStatus.SHIPPED));
-            analytics.put("deliveredOrders", orderService.countOrdersByStatus(Order.OrderStatus.DELIVERED));
-            analytics.put("cancelledOrders", orderService.countOrdersByStatus(Order.OrderStatus.CANCELLED));
-
-            // Revenue analytics
-            BigDecimal totalRevenue = orderService.sumTotalRevenue();
-            analytics.put("totalRevenue", totalRevenue != null ? totalRevenue.doubleValue() : 0.0);
-            analytics.put("monthlyRevenue", orderService.sumOrderAmountBetweenDates(startOfMonth, now));
-
-            return ResponseEntity.ok(analytics);
+            return ResponseEntity.ok(orderService.getGlobalOrderAnalytics());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Error fetching order analytics: " + e.getMessage()));
@@ -393,35 +324,9 @@ public class AdminController {
         try {
             User currentUser = getAuthenticatedUser(request);
             if (currentUser != null && currentUser.getUserType() == User.UserType.ORGANIZATION) {
-                return ResponseEntity.ok(orderService.getOrganizationDashboardStats(currentUser));
+                return ResponseEntity.ok(orderService.getOrganizationPaymentAnalytics(currentUser));
             }
-
-            LocalDateTime now = LocalDateTime.now();
-            LocalDateTime startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
-            LocalDateTime startOfYear = now.withDayOfYear(1).withHour(0).withMinute(0).withSecond(0);
-
-            Map<String, Object> analytics = new HashMap<>();
-
-            // Payment statistics
-            analytics.put("totalPayments", paymentService.countAllPayments());
-            analytics.put("paymentsThisMonth", paymentService.countPaymentsCreatedAfter(startOfMonth));
-            analytics.put("paymentsThisYear", paymentService.countPaymentsCreatedAfter(startOfYear));
-
-            // Payment status breakdown
-            analytics.put("completedPayments", paymentService.countPaymentsByStatus(Payment.PaymentStatus.COMPLETED));
-            analytics.put("pendingPayments", paymentService.countPaymentsByStatus(Payment.PaymentStatus.PENDING));
-            analytics.put("failedPayments", paymentService.countPaymentsByStatus(Payment.PaymentStatus.FAILED));
-
-            // Revenue analytics
-            BigDecimal totalRevenue = orderService.sumTotalRevenue();
-            analytics.put("totalRevenue", totalRevenue != null ? totalRevenue.doubleValue() : 0.0);
-            analytics.put("monthlyRevenue", paymentService.sumSuccessfulPaymentsBetweenDates(startOfMonth, now));
-
-            // Payment method breakdown
-            analytics.put("esewaPayments", paymentService.countPaymentsByMethod(Payment.PaymentMethod.ESEWA));
-            analytics.put("cashPayments", paymentService.countPaymentsByMethod(Payment.PaymentMethod.CASH));
-
-            return ResponseEntity.ok(analytics);
+            return ResponseEntity.ok(orderService.getGlobalPaymentAnalytics());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Error fetching payment analytics: " + e.getMessage()));
@@ -438,40 +343,9 @@ public class AdminController {
         try {
             User currentUser = getAuthenticatedUser(request);
             if (currentUser != null && currentUser.getUserType() == User.UserType.ORGANIZATION) {
-                return ResponseEntity.ok(orderService.getOrganizationDashboardStats(currentUser));
+                return ResponseEntity.ok(orderService.getOrganizationBusinessAnalytics(currentUser));
             }
-
-            LocalDateTime now = LocalDateTime.now();
-            LocalDateTime startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
-            LocalDateTime startOfYear = now.withDayOfYear(1).withHour(0).withMinute(0).withSecond(0);
-
-            Map<String, Object> analytics = new HashMap<>();
-
-            // User analytics
-            List<User> allUsers = userService.getAllUsers();
-            analytics.put("totalUsers", allUsers.size());
-            analytics.put("newUsersThisMonth", userService.countUsersCreatedAfter(startOfMonth));
-            analytics.put("activeUsers",
-                    allUsers.stream().filter(u -> u.getStatus() == User.UserStatus.ACTIVE).count());
-
-            // Book analytics
-            List<Book> allBooks = bookService.getAllBooks();
-            analytics.put("totalBooks", allBooks.size());
-            analytics.put("booksThisMonth", bookService.countBooksCreatedAfter(startOfMonth));
-            analytics.put("availableBooks", bookService.countBooksByStatus(Book.BookStatus.AVAILABLE));
-            analytics.put("soldBooks", bookService.countBooksByStatus(Book.BookStatus.SOLD));
-
-            // Combined revenue (orders + upwork)
-            BigDecimal orderRevenue = orderService.sumTotalRevenue();
-            Double upworkRevenue = upworkTransactionService.sumCompletedTransactions();
-
-            double totalRev = (orderRevenue != null ? orderRevenue.doubleValue() : 0.0)
-                    + (upworkRevenue != null ? upworkRevenue : 0.0);
-            analytics.put("totalRevenue", totalRev);
-            analytics.put("orderRevenue", orderRevenue != null ? orderRevenue.doubleValue() : 0.0);
-            analytics.put("upworkRevenue", upworkRevenue != null ? upworkRevenue : 0.0);
-
-            return ResponseEntity.ok(analytics);
+            return ResponseEntity.ok(orderService.getGlobalBusinessAnalytics());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Error fetching business analytics: " + e.getMessage()));

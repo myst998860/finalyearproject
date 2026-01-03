@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { 
-  Users, 
-  BookOpen, 
-  ShoppingCart, 
+import {
+  Users,
+  BookOpen,
+  ShoppingCart,
   DollarSign
 } from 'lucide-react';
 import { getDashboardStats } from '../services/api.js';
@@ -11,7 +11,7 @@ import { useAuthRedirect } from '../hooks/useAuthRedirect';
 export default function Dashboard() {
   // Add authentication redirect hook
   useAuthRedirect();
-  
+
   const { data: stats, isLoading, error } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: getDashboardStats,
@@ -63,45 +63,12 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
         gap: '20px',
         marginBottom: '32px'
       }}>
-        {/* <div style={{
-          background: 'white',
-          padding: '24px',
-          borderRadius: '12px',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-          border: '1px solid #e5e7eb'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div style={{
-              width: '48px',
-              height: '48px',
-              background: '#dbeafe',
-              borderRadius: '10px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <BookOpen style={{ width: '24px', height: '24px', color: '#3b82f6' }} />
-            </div>
-            <div>
-              <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937' }}>
-                {stats?.totalBooks || 0}
-              </div>
-              <div style={{ fontSize: '16px', color: '#6b7280', marginBottom: '4px' }}>
-                Books Listed
-              </div>
-              <div style={{ fontSize: '14px', color: '#10b981' }}>
-                +{stats?.newBooksThisMonth || 0} from last month
-              </div>
-            </div>
-          </div>
-        </div> */}
-
         <div style={{
           background: 'white',
           padding: '24px',
@@ -146,23 +113,56 @@ export default function Dashboard() {
             <div style={{
               width: '48px',
               height: '48px',
-              background: '#e9d5ff',
+              background: '#ede9fe',
               borderRadius: '10px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <ShoppingCart style={{ width: '24px', height: '24px', color: '#8b5cf6' }} />
+              <BookOpen style={{ width: '24px', height: '24px', color: '#8b5cf6' }} />
             </div>
             <div>
               <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937' }}>
-                {stats?.pendingOrders || 0}
+                Rs. {stats?.bookRevenue || stats?.totalRevenue || 0}/-
               </div>
               <div style={{ fontSize: '16px', color: '#6b7280', marginBottom: '4px' }}>
-                Pending Orders
+                Book Revenue
               </div>
               <div style={{ fontSize: '14px', color: '#6b7280' }}>
-                {stats?.totalOrders || 0} total orders
+                From book sales
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{
+          background: 'white',
+          padding: '24px',
+          borderRadius: '12px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+          border: '1px solid #e5e7eb'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              background: '#ede9fe',
+              borderRadius: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <DollarSign style={{ width: '24px', height: '24px', color: '#0ea5e9' }} />
+            </div>
+            <div>
+              <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937' }}>
+                Rs. {stats?.totalRevenue || 0}/-
+              </div>
+              <div style={{ fontSize: '16px', color: '#6b7280', marginBottom: '4px' }}>
+                Total Revenue
+              </div>
+              <div style={{ fontSize: '14px', color: '#6b7280' }}>
+                Books + Videos
               </div>
             </div>
           </div>
@@ -185,17 +185,17 @@ export default function Dashboard() {
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <DollarSign style={{ width: '24px', height: '24px', color: '#f59e0b' }} />
+              < DollarSign style={{ width: '24px', height: '24px', color: '#f59e0b' }} />
             </div>
             <div>
               <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937' }}>
-                Rs. {stats?.totalRevenue || 0}/-
+                Rs. {stats?.tutorialRevenue || 0}/-
               </div>
               <div style={{ fontSize: '16px', color: '#6b7280', marginBottom: '4px' }}>
-                Total Revenue
+                Tutorial Revenue
               </div>
               <div style={{ fontSize: '14px', color: '#6b7280' }}>
-                From all orders
+                {stats?.tutorialSales || 0} video sales
               </div>
             </div>
           </div>
@@ -203,10 +203,10 @@ export default function Dashboard() {
       </div>
 
       {/* Recent Orders */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
-        gap: '24px' 
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+        gap: '24px'
       }}>
         <div style={{
           background: 'white',
@@ -221,7 +221,7 @@ export default function Dashboard() {
             </h3>
             <ShoppingCart style={{ width: '20px', height: '20px', color: '#6b7280' }} />
           </div>
-          
+
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: '#f9fafb', borderRadius: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>
@@ -251,5 +251,4 @@ export default function Dashboard() {
       </div>
     </div>
   );
-} 
- 
+}

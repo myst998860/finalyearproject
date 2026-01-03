@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Users, 
-  BookOpen, 
-  ShoppingCart, 
+import {
+  Users,
+  BookOpen,
+  ShoppingCart,
   DollarSign,
   Activity,
   Download
 } from 'lucide-react';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
   ResponsiveContainer,
   LineChart as RechartsLineChart,
   Line,
@@ -40,24 +40,24 @@ const Analytics = () => {
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
     const userType = storedUser.userType?.toLowerCase();
-    
+
     if (!storedUser.token || (userType !== 'admin' && userType !== 'organization')) {
-    toast.error('Access denied. Admin or Organization login required.');
-    navigate('/login');
-    return;
-  }
-    
+      toast.error('Access denied. Admin or Organization login required.');
+      navigate('/login');
+      return;
+    }
+
     setUser(storedUser);
   }, [navigate]);
 
   // Fetch analytics data with organization token
   const fetchDashboardStats = async () => {
     const headers = getAuthHeaders();
-    const response = await fetch('http://localhost:8082/api/aadmin/dashboard', {
+    const response = await fetch('http://localhost:8082/api/admin/dashboard', {
       headers: headers,
       credentials: 'include'
     });
-    
+
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
         toast.error('Authentication required. Please login again.');
@@ -67,7 +67,7 @@ const Analytics = () => {
       const errorText = await response.text().catch(() => 'Failed to fetch dashboard stats');
       throw new Error(errorText || 'Failed to fetch dashboard stats');
     }
-    
+
     return response.json();
   };
 
@@ -77,7 +77,7 @@ const Analytics = () => {
       headers: headers,
       credentials: 'include'
     });
-    
+
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
         toast.error('Authentication required. Please login again.');
@@ -87,7 +87,7 @@ const Analytics = () => {
       const errorText = await response.text().catch(() => 'Failed to fetch orders');
       throw new Error(errorText || 'Failed to fetch orders');
     }
-    
+
     return response.json();
   };
 
@@ -97,7 +97,7 @@ const Analytics = () => {
       headers: headers,
       credentials: 'include'
     });
-    
+
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
         toast.error('Authentication required. Please login again.');
@@ -107,7 +107,7 @@ const Analytics = () => {
       const errorText = await response.text().catch(() => 'Failed to fetch books');
       throw new Error(errorText || 'Failed to fetch books');
     }
-    
+
     return response.json();
   };
 
@@ -117,7 +117,7 @@ const Analytics = () => {
       headers: headers,
       credentials: 'include'
     });
-    
+
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
         toast.error('Authentication required. Please login again.');
@@ -127,7 +127,7 @@ const Analytics = () => {
       const errorText = await response.text().catch(() => 'Failed to fetch users');
       throw new Error(errorText || 'Failed to fetch users');
     }
-    
+
     const data = await response.json();
     // Handle paginated response
     return Array.isArray(data) ? data : (data.content || data.users || []);
@@ -139,7 +139,7 @@ const Analytics = () => {
       headers: headers,
       credentials: 'include'
     });
-    
+
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
         throw new Error('Authentication failed');
@@ -147,7 +147,7 @@ const Analytics = () => {
       const errorText = await response.text().catch(() => 'Failed to fetch order analytics');
       throw new Error(errorText || 'Failed to fetch order analytics');
     }
-    
+
     return response.json();
   };
 
@@ -157,7 +157,7 @@ const Analytics = () => {
       headers: headers,
       credentials: 'include'
     });
-    
+
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
         throw new Error('Authentication failed');
@@ -165,7 +165,7 @@ const Analytics = () => {
       const errorText = await response.text().catch(() => 'Failed to fetch payment analytics');
       throw new Error(errorText || 'Failed to fetch payment analytics');
     }
-    
+
     return response.json();
   };
 
@@ -175,7 +175,7 @@ const Analytics = () => {
       headers: headers,
       credentials: 'include'
     });
-    
+
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
         throw new Error('Authentication failed');
@@ -183,7 +183,7 @@ const Analytics = () => {
       const errorText = await response.text().catch(() => 'Failed to fetch business analytics');
       throw new Error(errorText || 'Failed to fetch business analytics');
     }
-    
+
     return response.json();
   };
 
@@ -193,12 +193,12 @@ const Analytics = () => {
       headers: headers,
       credentials: 'include'
     });
-    
+
     if (!response.ok) {
       const errorText = await response.text().catch(() => 'Failed to download analytics PDF');
       throw new Error(errorText || 'Failed to download analytics PDF');
     }
-    
+
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -345,78 +345,78 @@ const Analytics = () => {
   // Calculate analytics data
   const calculateOrderTrends = () => {
     if (!orders) return [];
-    
+
     const now = new Date();
     const days = parseInt(selectedPeriod);
     const data = [];
-    
+
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date(now);
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
-      
+
       const dayOrders = orders.filter(order => {
         const orderDate = new Date(order.createdAt).toISOString().split('T')[0];
         return orderDate === dateStr;
       });
-      
+
       data.push({
         date: dateStr,
         orders: dayOrders.length,
         revenue: dayOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0)
       });
     }
-    
+
     return data;
   };
 
   const calculateBookStats = () => {
     if (!books) return {};
-    
+
     const categories = {};
     const statuses = {};
     const monthlyListings = {};
-    
+
     books.forEach(book => {
       // Category stats
       const category = book.category || 'Uncategorized';
       categories[category] = (categories[category] || 0) + 1;
-      
+
       // Status stats
       const status = book.status || 'Unknown';
       statuses[status] = (statuses[status] || 0) + 1;
-      
+
       // Monthly listings
       const listingDate = new Date(book.createdAt);
       const monthYear = `${listingDate.getFullYear()}-${String(listingDate.getMonth() + 1).padStart(2, '0')}`;
       monthlyListings[monthYear] = (monthlyListings[monthYear] || 0) + 1;
     });
-    
+
     return { categories, statuses, monthlyListings };
   };
 
   const calculateUserStats = () => {
     if (!users || !Array.isArray(users)) return {};
-    
+
     const userTypes = {};
     const statuses = {};
     const monthlyRegistrations = {};
-    
+
     users.forEach(user => {
       // User type stats
       const userType = user.userType || 'Unknown';
       userTypes[userType] = (userTypes[userType] || 0) + 1;
-      
+
       // Status stats
       const status = user.status || 'Unknown';
       statuses[status] = (statuses[status] || 0) + 1;
-      
+
       // Monthly registrations
       const registrationDate = new Date(user.createdAt);
       const monthYear = `${registrationDate.getFullYear()}-${String(registrationDate.getMonth() + 1).padStart(2, '0')}`;
       monthlyRegistrations[monthYear] = (monthlyRegistrations[monthYear] || 0) + 1;
     });
-    
+
     return { userTypes, statuses, monthlyRegistrations };
   };
 
@@ -424,8 +424,8 @@ const Analytics = () => {
   const bookStats = calculateBookStats();
   const userStats = calculateUserStats();
 
-  const isLoading = statsLoading || ordersLoading || booksLoading || usersLoading || 
-                   orderAnalyticsLoading || paymentAnalyticsLoading || businessAnalyticsLoading;
+  const isLoading = statsLoading || ordersLoading || booksLoading || usersLoading ||
+    orderAnalyticsLoading || paymentAnalyticsLoading || businessAnalyticsLoading;
 
   // PDF Download Function
   const downloadPDF = async () => {
@@ -457,20 +457,20 @@ const Analytics = () => {
   }
 
   // Check for authentication errors
-  const hasAuthError = statsError?.message?.includes('Authentication') || 
-                       statsError?.message?.includes('401') || 
-                       statsError?.message?.includes('403') ||
-                       ordersError?.message?.includes('Authentication') ||
-                       ordersError?.message?.includes('401') ||
-                       ordersError?.message?.includes('403');
+  const hasAuthError = statsError?.message?.includes('Authentication') ||
+    statsError?.message?.includes('401') ||
+    statsError?.message?.includes('403') ||
+    ordersError?.message?.includes('Authentication') ||
+    ordersError?.message?.includes('401') ||
+    ordersError?.message?.includes('403');
 
   if (hasAuthError) {
     return (
-      <div style={{ 
-        display: 'flex', 
+      <div style={{
+        display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center', 
-        justifyContent: 'center', 
+        alignItems: 'center',
+        justifyContent: 'center',
         height: '400px',
         gap: '16px'
       }}>
@@ -510,26 +510,26 @@ const Analytics = () => {
   return (
     <div style={{ padding: '20px', background: '#f8fafc', minHeight: '100vh' }}>
       {/* Header */}
-      <header style={{ 
-        background: 'white', 
-        borderBottom: '1px solid #e5e7eb', 
+      <header style={{
+        background: 'white',
+        borderBottom: '1px solid #e5e7eb',
         padding: '16px 20px',
         marginBottom: '24px',
         borderRadius: '12px 12px 0 0'
       }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'center',
           maxWidth: '1400px',
           margin: '0 auto'
         }}>
           <div>
-            <h1 style={{ 
-              margin: 0, 
-              fontSize: '24px', 
-              fontWeight: 'bold', 
-              color: '#1f2937' 
+            <h1 style={{
+              margin: 0,
+              fontSize: '24px',
+              fontWeight: 'bold',
+              color: '#1f2937'
             }}>
               Analytics Dashboard
             </h1>
@@ -538,7 +538,7 @@ const Analytics = () => {
             </p>
           </div>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <button 
+            <button
               onClick={() => navigate('/adminpanel')}
               style={{
                 padding: '8px 16px',
@@ -595,7 +595,7 @@ const Analytics = () => {
             <span style={{ color: '#6b7280', fontSize: '14px' }}>
               {user.fullName || user.email}
             </span>
-            <button 
+            <button
               onClick={handleLogout}
               style={{
                 padding: '8px 16px',
@@ -658,68 +658,13 @@ const Analytics = () => {
         </div>
 
         {/* Key Metrics */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
           gap: '20px',
           marginBottom: '32px'
         }}>
-          <div style={{
-            background: 'white',
-            padding: '24px',
-            borderRadius: '12px',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-            border: '1px solid #e5e7eb'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{
-                width: '40px',
-                height: '40px',
-                background: '#dbeafe',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <ShoppingCart style={{ width: '20px', height: '20px', color: '#3b82f6' }} />
-              </div>
-              <div>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937' }}>
-                  {stats?.totalOrders || orders?.length || 0}
-                </div>
-                <div style={{ fontSize: '14px', color: '#6b7280' }}>Total Orders</div>
-              </div>
-            </div>
-          </div>
-
-          <div style={{
-            background: 'white',
-            padding: '24px',
-            borderRadius: '12px',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-            border: '1px solid #e5e7eb'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{
-                width: '40px',
-                height: '40px',
-                background: '#dcfce7',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <DollarSign style={{ width: '20px', height: '20px', color: '#10b981' }} />
-              </div>
-              <div>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937' }}>
-                  Rs. {stats?.totalRevenue || orders?.reduce((sum, order) => sum + (order.totalAmount || 0), 0) || 0}/-
-                </div>
-                <div style={{ fontSize: '14px', color: '#6b7280' }}>Total Revenue</div>
-              </div>
-            </div>
-          </div>
-
+          {/* Total Users */}
           <div style={{
             background: 'white',
             padding: '24px',
@@ -748,6 +693,7 @@ const Analytics = () => {
             </div>
           </div>
 
+          {/* Book Revenue */}
           <div style={{
             background: 'white',
             padding: '24px',
@@ -759,7 +705,7 @@ const Analytics = () => {
               <div style={{
                 width: '40px',
                 height: '40px',
-                background: '#f3e8ff',
+                background: '#ede9fe',
                 borderRadius: '8px',
                 display: 'flex',
                 alignItems: 'center',
@@ -769,9 +715,69 @@ const Analytics = () => {
               </div>
               <div>
                 <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937' }}>
-                  {stats?.totalBooks || books?.length || 0}
+                  Rs. {stats?.bookRevenue || 0}/-
                 </div>
-                <div style={{ fontSize: '14px', color: '#6b7280' }}>Total Books</div>
+                <div style={{ fontSize: '14px', color: '#6b7280' }}>Book Revenue</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Tutorial Revenue */}
+          <div style={{
+            background: 'white',
+            padding: '24px',
+            borderRadius: '12px',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+            border: '1px solid #e5e7eb'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                background: '#fef3c7',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <DollarSign style={{ width: '20px', height: '20px', color: '#f59e0b' }} />
+              </div>
+              <div>
+                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937' }}>
+                  Rs. {stats?.tutorialRevenue || 0}/-
+                </div>
+                <div style={{ fontSize: '14px', color: '#6b7280' }}>
+                  Tutorial Revenue ({stats?.tutorialSales || 0} sales)
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Total Revenue */}
+          <div style={{
+            background: 'white',
+            padding: '24px',
+            borderRadius: '12px',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+            border: '1px solid #e5e7eb'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                background: '#dcfce7',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <DollarSign style={{ width: '20px', height: '20px', color: '#10b981' }} />
+              </div>
+              <div>
+                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937' }}>
+                  Rs. {stats?.totalRevenue || 0}/-
+                </div>
+                <div style={{ fontSize: '14px', color: '#6b7280' }}>Total Combined Revenue</div>
               </div>
             </div>
           </div>
@@ -991,8 +997,16 @@ const Analytics = () => {
                   <span style={{ fontSize: '14px', color: '#374151' }}>Delivered Orders</span>
                   <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>{orderAnalytics.deliveredOrders || 0}</span>
                 </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#fef3c7', borderRadius: '6px' }}>
+                  <span style={{ fontSize: '14px', color: '#374151' }}>Book Revenue</span>
+                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>Rs. {orderAnalytics.bookRevenue || orderAnalytics.totalRevenue || 0}/-</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#fef3c7', borderRadius: '6px' }}>
+                  <span style={{ fontSize: '14px', color: '#374151' }}>Tutorial Revenue</span>
+                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>Rs. {orderAnalytics.tutorialRevenue || 0}/-</span>
+                </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#dcfce7', borderRadius: '6px' }}>
-                  <span style={{ fontSize: '14px', color: '#374151' }}>Total Revenue</span>
+                  <span style={{ fontSize: '14px', color: '#374151' }}>Total Revenue (Combined)</span>
                   <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>Rs. {orderAnalytics.totalRevenue || 0}/-</span>
                 </div>
               </div>
@@ -1028,8 +1042,16 @@ const Analytics = () => {
                   <span style={{ fontSize: '14px', color: '#374151' }}>Failed Payments</span>
                   <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>{paymentAnalytics.failedPayments || 0}</span>
                 </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#fef3c7', borderRadius: '6px' }}>
+                  <span style={{ fontSize: '14px', color: '#374151' }}>Book Revenue</span>
+                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>Rs. {paymentAnalytics.bookRevenue || paymentAnalytics.totalRevenue || 0}/-</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#fef3c7', borderRadius: '6px' }}>
+                  <span style={{ fontSize: '14px', color: '#374151' }}>Tutorial Revenue</span>
+                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>Rs. {paymentAnalytics.tutorialRevenue || 0}/-</span>
+                </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#dcfce7', borderRadius: '6px' }}>
-                  <span style={{ fontSize: '14px', color: '#374151' }}>Total Revenue</span>
+                  <span style={{ fontSize: '14px', color: '#374151' }}>Total Revenue (Combined)</span>
                   <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>Rs. {paymentAnalytics.totalRevenue || 0}/-</span>
                 </div>
               </div>
@@ -1065,9 +1087,17 @@ const Analytics = () => {
                   <span style={{ fontSize: '14px', color: '#374151' }}>Total Books</span>
                   <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>{businessAnalytics.totalBooks || 0}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#dcfce7', borderRadius: '6px' }}>
-                  <span style={{ fontSize: '14px', color: '#374151' }}>Available Books</span>
-                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>{businessAnalytics.availableBooks || 0}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#fef3c7', borderRadius: '6px' }}>
+                  <span style={{ fontSize: '14px', color: '#374151' }}>Book Revenue</span>
+                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>Rs. {businessAnalytics.bookRevenue || businessAnalytics.orderRevenue || 0}/-</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#fef3c7', borderRadius: '6px' }}>
+                  <span style={{ fontSize: '14px', color: '#374151' }}>Tutorial Revenue</span>
+                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>Rs. {businessAnalytics.tutorialRevenue || 0}/-</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#ede9fe', borderRadius: '6px' }}>
+                  <span style={{ fontSize: '14px', color: '#374151' }}>Total Business Revenue</span>
+                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>Rs. {businessAnalytics.totalRevenue || 0}/-</span>
                 </div>
               </div>
             </div>

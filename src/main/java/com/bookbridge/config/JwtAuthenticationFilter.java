@@ -28,7 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        
+
         String requestURI = request.getRequestURI();
         final String authHeader = request.getHeader("Authorization");
         String username = null;
@@ -37,21 +37,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("JwtAuthenticationFilter: Processing request to " + requestURI);
         System.out.println("JwtAuthenticationFilter: Authorization header = " + authHeader);
 
-        // ========== CRITICAL FIX: SKIP JWT FOR PUBLIC TUTORIAL ENDPOINTS ==========
-        // Check if this is a public GET request to tutorials
-        if (requestURI.startsWith("/api/tutorials/") && request.getMethod().equals("GET")) {
-            System.out.println("JwtAuthenticationFilter: Skipping JWT check for public tutorial GET request");
-            filterChain.doFilter(request, response);
-            return; // Skip JWT processing entirely
-        }
-
         // Check for admin session authentication first
-        if (requestURI.startsWith("/api/admin/") && 
-            !requestURI.equals("/api/admin/login") && 
-            !requestURI.equals("/api/admin/setup") &&
-            !requestURI.equals("/api/admin/test-session") &&
-            !requestURI.equals("/api/admin/test-auth")) {
-            
+        if (requestURI.startsWith("/api/admin/") &&
+                !requestURI.equals("/api/admin/login") &&
+                !requestURI.equals("/api/admin/setup") &&
+                !requestURI.equals("/api/admin/test-session") &&
+                !requestURI.equals("/api/admin/test-auth")) {
+
             HttpSession session = request.getSession(false);
             if (session != null) {
                 Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
@@ -59,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (isAdmin != null && isAdmin && adminId != null) {
                     System.out.println("JwtAuthenticationFilter: Admin session found for admin ID: " + adminId);
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        "admin", null, java.util.Collections.emptyList());
+                            "admin", null, java.util.Collections.emptyList());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 } else {
@@ -99,7 +91,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // Continue without authentication
             }
         }
-        
+
         System.out.println("JwtAuthenticationFilter: Continuing filter chain");
         filterChain.doFilter(request, response);
     }

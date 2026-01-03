@@ -92,7 +92,7 @@ public class OrganizationController {
                         .body(Map.of("message", "User not found"));
             }
 
-            Map<String, Object> analytics = orderService.getUserOrderAnalytics(userOpt.get());
+            Map<String, Object> analytics = orderService.getOrganizationOrderAnalytics(userOpt.get());
             return ResponseEntity.ok(analytics);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

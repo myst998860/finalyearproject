@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { 
-  Users, 
-  BookOpen, 
-  ShoppingCart, 
+import {
+  Users,
+  BookOpen,
+  ShoppingCart,
   DollarSign,
   Activity,
   Download
 } from 'lucide-react';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
   ResponsiveContainer,
   LineChart as RechartsLineChart,
   Line,
@@ -31,7 +31,7 @@ import { useAuthRedirect } from '../hooks/useAuthRedirect';
 export default function Analytics() {
   // Add authentication redirect hook
   useAuthRedirect();
-  
+
   const [selectedPeriod, setSelectedPeriod] = useState('30'); // 7, 30, 90 days
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
@@ -166,78 +166,78 @@ export default function Analytics() {
   // Calculate analytics data
   const calculateOrderTrends = () => {
     if (!orders) return [];
-    
+
     const now = new Date();
     const days = parseInt(selectedPeriod);
     const data = [];
-    
+
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date(now);
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
-      
+
       const dayOrders = orders.filter(order => {
         const orderDate = new Date(order.createdAt).toISOString().split('T')[0];
         return orderDate === dateStr;
       });
-      
+
       data.push({
         date: dateStr,
         orders: dayOrders.length,
         revenue: dayOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0)
       });
     }
-    
+
     return data;
   };
 
   const calculateBookStats = () => {
     if (!books) return {};
-    
+
     const categories = {};
     const statuses = {};
     const monthlyListings = {};
-    
+
     books.forEach(book => {
       // Category stats
       const category = book.category || 'Uncategorized';
       categories[category] = (categories[category] || 0) + 1;
-      
+
       // Status stats
       const status = book.status || 'Unknown';
       statuses[status] = (statuses[status] || 0) + 1;
-      
+
       // Monthly listings
       const listingDate = new Date(book.createdAt);
       const monthYear = `${listingDate.getFullYear()}-${String(listingDate.getMonth() + 1).padStart(2, '0')}`;
       monthlyListings[monthYear] = (monthlyListings[monthYear] || 0) + 1;
     });
-    
+
     return { categories, statuses, monthlyListings };
   };
 
   const calculateUserStats = () => {
     if (!users) return {};
-    
+
     const userTypes = {};
     const statuses = {};
     const monthlyRegistrations = {};
-    
+
     users.forEach(user => {
       // User type stats
       const userType = user.userType || 'Unknown';
       userTypes[userType] = (userTypes[userType] || 0) + 1;
-      
+
       // Status stats
       const status = user.status || 'Unknown';
       statuses[status] = (statuses[status] || 0) + 1;
-      
+
       // Monthly registrations
       const registrationDate = new Date(user.createdAt);
       const monthYear = `${registrationDate.getFullYear()}-${String(registrationDate.getMonth() + 1).padStart(2, '0')}`;
       monthlyRegistrations[monthYear] = (monthlyRegistrations[monthYear] || 0) + 1;
     });
-    
+
     return { userTypes, statuses, monthlyRegistrations };
   };
 
@@ -245,8 +245,8 @@ export default function Analytics() {
   const bookStats = calculateBookStats();
   const userStats = calculateUserStats();
 
-  const isLoading = statsLoading || ordersLoading || booksLoading || usersLoading || 
-                   orderAnalyticsLoading || paymentAnalyticsLoading || businessAnalyticsLoading;
+  const isLoading = statsLoading || ordersLoading || booksLoading || usersLoading ||
+    orderAnalyticsLoading || paymentAnalyticsLoading || businessAnalyticsLoading;
 
   // PDF Download Function - Updated to use backend generation
   const downloadPDF = async () => {
@@ -356,9 +356,9 @@ export default function Analytics() {
       </div>
 
       {/* Key Metrics */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
         gap: '20px',
         marginBottom: '32px'
       }}>
@@ -386,6 +386,62 @@ export default function Analytics() {
                 {stats?.totalOrders || 0}
               </div>
               <div style={{ fontSize: '14px', color: '#6b7280' }}>Total Orders</div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{
+          background: 'white',
+          padding: '24px',
+          borderRadius: '12px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+          border: '1px solid #e5e7eb'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              background: '#ede9fe',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <DollarSign style={{ width: '20px', height: '20px', color: '#8b5cf6' }} />
+            </div>
+            <div>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937' }}>
+                Rs. {stats?.bookRevenue || stats?.totalRevenue || 0}/-
+              </div>
+              <div style={{ fontSize: '14px', color: '#6b7280' }}>Book Revenue</div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{
+          background: 'white',
+          padding: '24px',
+          borderRadius: '12px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+          border: '1px solid #e5e7eb'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              background: '#fef3c7',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <DollarSign style={{ width: '20px', height: '20px', color: '#f59e0b' }} />
+            </div>
+            <div>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937' }}>
+                Rs. {stats?.tutorialRevenue || 0}/-
+              </div>
+              <div style={{ fontSize: '14px', color: '#6b7280' }}>Tutorial Revenue</div>
             </div>
           </div>
         </div>
@@ -726,8 +782,12 @@ export default function Analytics() {
                 <span style={{ fontSize: '14px', color: '#374151' }}>Failed Payments</span>
                 <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>{paymentAnalytics.failedPayments || 0}</span>
               </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#fef3c7', borderRadius: '6px' }}>
+                <span style={{ fontSize: '14px', color: '#374151' }}>Tutorial Revenue</span>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>Rs. {paymentAnalytics.tutorialRevenue || 0}/-</span>
+              </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#dcfce7', borderRadius: '6px' }}>
-                <span style={{ fontSize: '14px', color: '#374151' }}>Total Revenue</span>
+                <span style={{ fontSize: '14px', color: '#374151' }}>Total Revenue (Books + Tutorials)</span>
                 <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>Rs. {paymentAnalytics.totalRevenue || 0}/-</span>
               </div>
             </div>
@@ -766,6 +826,14 @@ export default function Analytics() {
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#dcfce7', borderRadius: '6px' }}>
                 <span style={{ fontSize: '14px', color: '#374151' }}>Available Books</span>
                 <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>{businessAnalytics.availableBooks || 0}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#fef3c7', borderRadius: '6px' }}>
+                <span style={{ fontSize: '14px', color: '#374151' }}>Tutorial Revenue</span>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>Rs. {businessAnalytics.tutorialRevenue || 0}/-</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#ede9fe', borderRadius: '6px' }}>
+                <span style={{ fontSize: '14px', color: '#374151' }}>Total Business Revenue</span>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>Rs. {businessAnalytics.totalRevenue || 0}/-</span>
               </div>
             </div>
           </div>

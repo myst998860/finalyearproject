@@ -5,6 +5,8 @@ import com.bookbridge.repository.BookRepository;
 import com.bookbridge.repository.CartItemRepository;
 import com.bookbridge.repository.OrderItemRepository;
 import com.bookbridge.repository.OrderRepository;
+import com.bookbridge.repository.TutorialRepository;
+import com.bookbridge.repository.TutorialPurchaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,17 +29,32 @@ public class OrderService {
     private final CartItemRepository cartItemRepository;
     private final BookRepository bookRepository;
     private final NotificationService notificationService;
+    private final UserService userService;
+    private final PaymentService paymentService;
+    private final UpworkTransactionService upworkTransactionService;
+    private final TutorialRepository tutorialRepository;
+    private final TutorialPurchaseRepository tutorialPurchaseRepository;
 
     public OrderService(OrderRepository orderRepository,
             OrderItemRepository orderItemRepository,
             CartItemRepository cartItemRepository,
             BookRepository bookRepository,
-            NotificationService notificationService) {
+            NotificationService notificationService,
+            UserService userService,
+            PaymentService paymentService,
+            UpworkTransactionService upworkTransactionService,
+            TutorialRepository tutorialRepository,
+            TutorialPurchaseRepository tutorialPurchaseRepository) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.cartItemRepository = cartItemRepository;
         this.bookRepository = bookRepository;
         this.notificationService = notificationService;
+        this.userService = userService;
+        this.paymentService = paymentService;
+        this.upworkTransactionService = upworkTransactionService;
+        this.tutorialRepository = tutorialRepository;
+        this.tutorialPurchaseRepository = tutorialPurchaseRepository;
     }
 
     public Long countOrdersByOrganization(Long organizationId) {
@@ -148,7 +165,9 @@ public class OrderService {
             // Calculate total amount
             BigDecimal totalAmount = BigDecimal.ZERO;
             for (CartItem item : cartItems) {
-                if (item.getBook().getListingType() == Book.ListingType.SELL && item.getBook().getPrice() != null) {
+                if ((item.getBook().getListingType() == Book.ListingType.SELL
+                        || item.getBook().getListingType() == Book.ListingType.RENT)
+                        && item.getBook().getPrice() != null) {
                     totalAmount = totalAmount
                             .add(item.getBook().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
                 }
@@ -171,9 +190,11 @@ public class OrderService {
                 bookRepository.save(book);
 
                 // Create order item
-                BigDecimal unitPrice = (book.getListingType() == Book.ListingType.SELL && book.getPrice() != null)
-                        ? book.getPrice()
-                        : BigDecimal.ZERO;
+                BigDecimal unitPrice = ((book.getListingType() == Book.ListingType.SELL
+                        || book.getListingType() == Book.ListingType.RENT)
+                        && book.getPrice() != null)
+                                ? book.getPrice()
+                                : BigDecimal.ZERO;
                 OrderItem orderItem = new OrderItem(savedOrder, book, cartItem.getQuantity(), unitPrice);
                 orderItems.add(orderItemRepository.save(orderItem));
 
@@ -450,10 +471,174 @@ public class OrderService {
             Long newOrdersThisMonth = orderItemRepository.countOrdersByOrganizationAfterDate(user, startOfMonth);
             stats.put("newOrdersThisMonth", newOrdersThisMonth != null ? newOrdersThisMonth : 0L);
 
+            // 7. Tutorial Stats
+            long totalTutorials = tutorialRepository.countByOrganization(user);
+            stats.put("totalTutorials", totalTutorials);
+
+            long tutorialSales = tutorialPurchaseRepository.countByTutorialOrganization(user);
+            stats.put("tutorialSales", tutorialSales);
+
+            Double tutorialRevenueRaw = tutorialPurchaseRepository.sumRevenueByOrganization(user);
+            double tutorialRevenue = tutorialRevenueRaw != null ? tutorialRevenueRaw : 0.0;
+
+            // Apply 5% commission: Org gets 95%
+            double orgTutorialRevenue = tutorialRevenue * 0.95;
+            stats.put("tutorialRevenue", orgTutorialRevenue);
+
+            // Stats for breakdown
+            stats.put("bookRevenue", totalRevenue != null ? totalRevenue.doubleValue() : 0.0);
+
+            // Update totalRevenue to be combined
+            double totalCombinedRevenue = (totalRevenue != null ? totalRevenue.doubleValue() : 0.0)
+                    + orgTutorialRevenue;
+            stats.put("totalRevenue", totalCombinedRevenue);
+
             return stats;
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch organization dashboard stats", e);
         }
+    }
+
+    public Map<String, Object> getGlobalDashboardStats() {
+        LocalDateTime lastMonth = LocalDateTime.now().minusMonths(1);
+        LocalDateTime lastWeek = LocalDateTime.now().minusWeeks(1);
+        Map<String, Object> stats = new HashMap<>();
+
+        // User statistics
+        List<User> allUsers = userService.getAllUsers();
+        stats.put("totalUsers", allUsers.size());
+        stats.put("newUsersThisMonth", userService.countUsersCreatedAfter(lastMonth));
+        stats.put("activeUsers", allUsers.stream().filter(u -> u.getStatus() == User.UserStatus.ACTIVE).count());
+
+        // Book statistics
+        stats.put("totalBooks", bookRepository.countAllBooksNotDeleted());
+        stats.put("newBooksThisMonth", bookRepository.countBooksCreatedAfter(lastMonth));
+        stats.put("soldBooks", bookRepository.countBooksByStatus(Book.BookStatus.SOLD));
+
+        // Order statistics
+        stats.put("totalOrders", countAllOrders());
+        stats.put("newOrdersThisWeek", countOrdersCreatedAfter(lastWeek));
+        stats.put("pendingOrders", countOrdersByStatus(Order.OrderStatus.PENDING));
+
+        // Payment statistics
+        stats.put("totalPayments", paymentService.countAllPayments());
+        BigDecimal orderRevenue = sumTotalRevenue();
+        Double upworkRevenue = upworkTransactionService.sumCompletedTransactions();
+
+        // Tutorial statistics
+        Double tutorialRevenueRaw = tutorialPurchaseRepository.sumTotalRevenue();
+        double tutorialRevenue = tutorialRevenueRaw != null ? tutorialRevenueRaw : 0.0;
+        stats.put("tutorialRevenue", tutorialRevenue);
+        stats.put("totalTutorials", tutorialRepository.count());
+        stats.put("tutorialSales", tutorialPurchaseRepository.count());
+
+        double totalRevenueTotal = (orderRevenue != null ? orderRevenue.doubleValue() : 0.0)
+                + (upworkRevenue != null ? upworkRevenue : 0.0)
+                + tutorialRevenue;
+        stats.put("totalRevenue", totalRevenueTotal);
+        stats.put("bookRevenue", orderRevenue != null ? orderRevenue.doubleValue() : 0.0);
+        stats.put("upworkRevenue", upworkRevenue != null ? upworkRevenue : 0.0);
+        stats.put("revenueThisMonth", paymentService.sumSuccessfulPaymentsBetweenDates(lastMonth, LocalDateTime.now()));
+        stats.put("upworkTransactions", upworkRevenue);
+
+        return stats;
+    }
+
+    public Map<String, Object> getGlobalOrderAnalytics() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+        LocalDateTime startOfYear = now.withDayOfYear(1).withHour(0).withMinute(0).withSecond(0);
+        Map<String, Object> analytics = new HashMap<>();
+
+        analytics.put("totalOrders", countAllOrders());
+        analytics.put("ordersThisMonth", countOrdersCreatedAfter(startOfMonth));
+        analytics.put("ordersThisYear", countOrdersCreatedAfter(startOfYear));
+        analytics.put("pendingOrders", countOrdersByStatus(Order.OrderStatus.PENDING));
+        analytics.put("processingOrders", countOrdersByStatus(Order.OrderStatus.PROCESSING));
+        analytics.put("shippedOrders", countOrdersByStatus(Order.OrderStatus.SHIPPED));
+        analytics.put("deliveredOrders", countOrdersByStatus(Order.OrderStatus.DELIVERED));
+        analytics.put("cancelledOrders", countOrdersByStatus(Order.OrderStatus.CANCELLED));
+
+        BigDecimal bookRevenue = sumTotalRevenue();
+        Double tutorialRevenueRaw = tutorialPurchaseRepository.sumTotalRevenue();
+        double tutorialRevenue = tutorialRevenueRaw != null ? tutorialRevenueRaw : 0.0;
+
+        analytics.put("bookRevenue", bookRevenue != null ? bookRevenue.doubleValue() : 0.0);
+        analytics.put("tutorialRevenue", tutorialRevenue);
+        analytics.put("totalRevenue", (bookRevenue != null ? bookRevenue.doubleValue() : 0.0) + tutorialRevenue);
+        analytics.put("monthlyRevenue", sumOrderAmountBetweenDates(startOfMonth, now));
+
+        return analytics;
+    }
+
+    public Map<String, Object> getGlobalPaymentAnalytics() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+        LocalDateTime startOfYear = now.withDayOfYear(1).withHour(0).withMinute(0).withSecond(0);
+        Map<String, Object> analytics = new HashMap<>();
+
+        analytics.put("totalPayments", paymentService.countAllPayments());
+        analytics.put("paymentsThisMonth", paymentService.countPaymentsCreatedAfter(startOfMonth));
+        analytics.put("paymentsThisYear", paymentService.countPaymentsCreatedAfter(startOfYear));
+        analytics.put("completedPayments", paymentService.countPaymentsByStatus(Payment.PaymentStatus.COMPLETED));
+        analytics.put("pendingPayments", paymentService.countPaymentsByStatus(Payment.PaymentStatus.PENDING));
+        analytics.put("failedPayments", paymentService.countPaymentsByStatus(Payment.PaymentStatus.FAILED));
+
+        BigDecimal bookRevenue = sumTotalRevenue();
+        Double tutorialRevenueRaw = tutorialPurchaseRepository.sumTotalRevenue();
+        double tutorialRevenue = tutorialRevenueRaw != null ? tutorialRevenueRaw : 0.0;
+
+        analytics.put("bookRevenue", bookRevenue != null ? bookRevenue.doubleValue() : 0.0);
+        analytics.put("tutorialRevenue", tutorialRevenue);
+        analytics.put("totalRevenue", (bookRevenue != null ? bookRevenue.doubleValue() : 0.0) + tutorialRevenue);
+        analytics.put("monthlyRevenue", paymentService.sumSuccessfulPaymentsBetweenDates(startOfMonth, now));
+        analytics.put("esewaPayments", paymentService.countPaymentsByMethod(Payment.PaymentMethod.ESEWA));
+        analytics.put("cashPayments", paymentService.countPaymentsByMethod(Payment.PaymentMethod.CASH));
+
+        return analytics;
+    }
+
+    public Map<String, Object> getGlobalBusinessAnalytics() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+        Map<String, Object> analytics = new HashMap<>();
+
+        List<User> allUsers = userService.getAllUsers();
+        analytics.put("totalUsers", allUsers.size());
+        analytics.put("newUsersThisMonth", userService.countUsersCreatedAfter(startOfMonth));
+        analytics.put("activeUsers", allUsers.stream().filter(u -> u.getStatus() == User.UserStatus.ACTIVE).count());
+
+        analytics.put("totalBooks", bookRepository.countAllBooksNotDeleted());
+        analytics.put("booksThisMonth", bookRepository.countBooksCreatedAfter(startOfMonth));
+        analytics.put("availableBooks", bookRepository.countBooksByStatus(Book.BookStatus.AVAILABLE));
+        analytics.put("soldBooks", bookRepository.countBooksByStatus(Book.BookStatus.SOLD));
+
+        BigDecimal orderRevenue = sumTotalRevenue();
+        Double upworkRevenue = upworkTransactionService.sumCompletedTransactions();
+        Double tutorialRevenueRaw = tutorialPurchaseRepository.sumTotalRevenue();
+        double tutorialRevenue = tutorialRevenueRaw != null ? tutorialRevenueRaw : 0.0;
+
+        double totalRev = (orderRevenue != null ? orderRevenue.doubleValue() : 0.0)
+                + (upworkRevenue != null ? upworkRevenue : 0.0)
+                + tutorialRevenue;
+        analytics.put("totalRevenue", totalRev);
+        analytics.put("bookRevenue", orderRevenue != null ? orderRevenue.doubleValue() : 0.0);
+        analytics.put("upworkRevenue", upworkRevenue != null ? upworkRevenue : 0.0);
+        analytics.put("tutorialRevenue", tutorialRevenue);
+
+        return analytics;
+    }
+
+    public Map<String, Object> getOrganizationOrderAnalytics(User user) {
+        return getOrganizationDashboardStats(user); // Standardize for now
+    }
+
+    public Map<String, Object> getOrganizationPaymentAnalytics(User user) {
+        return getOrganizationDashboardStats(user); // Standardize for now
+    }
+
+    public Map<String, Object> getOrganizationBusinessAnalytics(User user) {
+        return getOrganizationDashboardStats(user); // Standardize for now
     }
 
     public BigDecimal sumTotalRevenue() {

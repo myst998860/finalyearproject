@@ -5,21 +5,21 @@ const BASE_URL = 'http://localhost:8082/api';
 export const getAuthHeaders = () => {
   const userData = localStorage.getItem('user');
   const token = userData ? JSON.parse(userData).token : null;
-  return token ? { 
+  return token ? {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + token 
+    'Authorization': 'Bearer ' + token
   } : { 'Content-Type': 'application/json' };
 };
 
 // Helper function to get image URL (handles both Cloudinary and local URLs)
 export const getImageUrl = (imagePath) => {
   if (!imagePath) return null;
-  
+
   // If it's already a full URL (Cloudinary), return as is
   if (imagePath.startsWith('http')) {
     return imagePath;
   }
-  
+
   // If it's a local file path, construct the full URL
   return `${BASE_URL}/files/${imagePath}`;
 };
@@ -27,12 +27,12 @@ export const getImageUrl = (imagePath) => {
 const handleResponse = async (response) => {
   // Check if response has content
   const text = await response.text();
-  
+
   // If response is empty or not JSON, throw a meaningful error
   if (!text || text.trim() === '') {
     throw new Error(`Server returned empty response (Status: ${response.status})`);
   }
-  
+
   // Try to parse JSON
   let data;
   try {
@@ -42,7 +42,7 @@ const handleResponse = async (response) => {
     console.error('Response text:', text);
     throw new Error(`Invalid JSON response from server: ${text.substring(0, 100)}...`);
   }
-  
+
   if (!response.ok) {
     // Handle authentication errors
     if (response.status === 401 || response.status === 403) {
@@ -77,15 +77,15 @@ export const register = async (accountType, formData) => {
   try {
     console.log('Attempting registration for:', accountType);
     console.log('FormData contents:', Array.from(formData.entries()));
-    
+
     const response = await fetch(`${BASE_URL}/register/${accountType}`, {
       method: 'POST',
       body: formData, // FormData includes the file and all fields
     });
-    
+
     console.log('Registration response status:', response.status);
     console.log('Registration response headers:', response.headers);
-    
+
     return handleResponse(response);
   } catch (error) {
     console.error('Registration API error:', error);
@@ -353,12 +353,12 @@ export const downloadOrderPDF = async (orderId) => {
       method: 'GET',
       headers: getAuthHeaders(),
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Failed to download PDF');
     }
-    
+
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -368,7 +368,7 @@ export const downloadOrderPDF = async (orderId) => {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
-    
+
     return true;
   } catch (error) {
     console.error('Download PDF API error:', error);
@@ -396,12 +396,12 @@ export const checkOrderPaymentStatus = async (orderId) => {
     method: 'GET',
     headers: getAuthHeaders(),
   });
-  
+
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to check payment status');
   }
-  
+
   return response.json();
 };
 
@@ -414,7 +414,7 @@ export const adminLogin = async (username, password) => {
       body: JSON.stringify({ email: username, password }),
       credentials: 'include' // Include cookies for session-based auth
     });
-    
+
     // Handle specific HTTP status codes
     if (response.status === 403) {
       throw new Error('Access denied. Invalid credentials or insufficient permissions.');
@@ -425,16 +425,16 @@ export const adminLogin = async (username, password) => {
     } else if (response.status >= 500) {
       throw new Error('Server error. Please try again later.');
     }
-    
+
     return handleResponse(response);
   } catch (error) {
     console.error('Admin login error:', error);
-    
+
     // Handle network errors
     if (error.name === 'TypeError' && error.message.includes('fetch')) {
       throw new Error('Network error. Please check your connection and try again.');
     }
-    
+
     throw error;
   }
 };
@@ -556,11 +556,11 @@ export const deleteAdminBook = async (bookId) => {
       method: 'DELETE',
       credentials: 'include'
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to delete book');
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error('Delete book error:', error);
@@ -610,11 +610,11 @@ export const logUpworkTransaction = async (transactionData) => {
       credentials: 'include',
       body: JSON.stringify(transactionData)
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to log transaction');
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error('Log transaction error:', error);
@@ -627,11 +627,11 @@ export const getUpworkTransactions = async () => {
     const response = await fetch(`${BASE_URL}/admin/upwork-transactions`, {
       credentials: 'include'
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to fetch transactions');
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error('Get transactions error:', error);
@@ -645,11 +645,11 @@ export const getOrderAnalytics = async () => {
     const response = await fetch(`${BASE_URL}/aadmin/admin/analytics/orders`, {
       credentials: 'include'
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to fetch order analytics');
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error('Get order analytics error:', error);
@@ -662,11 +662,11 @@ export const getPaymentAnalytics = async () => {
     const response = await fetch(`${BASE_URL}/admin/analytics/payments`, {
       credentials: 'include'
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to fetch payment analytics');
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error('Get payment analytics error:', error);
@@ -679,11 +679,11 @@ export const getBusinessAnalytics = async () => {
     const response = await fetch(`${BASE_URL}/admin/analytics/business`, {
       credentials: 'include'
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to fetch business analytics');
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error('Get business analytics error:', error);
@@ -698,12 +698,12 @@ export const downloadAnalyticsPDF = async () => {
       method: 'GET',
       credentials: 'include',
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Failed to download analytics PDF');
     }
-    
+
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -713,7 +713,7 @@ export const downloadAnalyticsPDF = async () => {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
-    
+
     return true;
   } catch (error) {
     console.error('Download analytics PDF API error:', error);
@@ -731,17 +731,17 @@ export const updateUpworkTransactionStatus = async (transactionId, status) => {
       credentials: 'include',
       body: JSON.stringify({ status })
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to update transaction status');
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error('Update transaction status error:', error);
     throw error;
   }
-  
+
 };
 
 // Helper to handle fetch response
@@ -782,3 +782,43 @@ export const uploadTutorial = async (formData, token) => {
 };
 
 // Get all published tutorials
+export const fetchAllTutorials = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/tutorials/active`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  } catch (error) {
+    console.error('Fetch active tutorials error:', error);
+    throw error;
+  }
+};
+
+// Check which tutorials the user has purchased
+export const fetchPurchasedTutorials = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/tutorials/purchased`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  } catch (error) {
+    console.error('Fetch purchased tutorials error:', error);
+    throw error;
+  }
+};
+
+// Record a new tutorial purchase
+export const purchaseTutorial = async (tutorialId, transactionId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/tutorials/purchase?tutorialId=${tutorialId}&transactionId=${transactionId}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  } catch (error) {
+    console.error('Record tutorial purchase error:', error);
+    throw error;
+  }
+};
