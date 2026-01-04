@@ -169,7 +169,7 @@ const Navbar = () => {
         <li onClick={() => handleNavigation('/contact')} className={location.pathname === '/contact' ? 'active' : ''}>Contact</li>
            <li onClick={() => handleNavigation('/tutorial')} className={location.pathname === '/contact' ? 'active' : ''}>Tutorial Video</li>
 
-        {isLoggedIn && userType === 'individual' && (
+        {/* {isLoggedIn && userType === 'individual' && (
           <li ref={listBookRef} className="dropdown" onClick={() => setIsModalOpen(!isModalOpen)}>
             List a product<span className="arrow">▼</span>
             {isModalOpen && (
@@ -184,7 +184,7 @@ const Navbar = () => {
                   <div className="right-panel-item" onClick={() => handleNavigation('/book-sell')}>
                     <div className="right-panel-title">Sell a product</div>
                     <div className="right-panel-subtitle">List your product for sale and earn money</div>
-                  </div>
+                  </div> */}
                   {/*
                   <div className="right-panel-item" onClick={() => handleNavigation('/book-exchange')}>
                     <div className="right-panel-title">Exchange a Book</div>
@@ -195,11 +195,11 @@ const Navbar = () => {
                     <div className="right-panel-subtitle">Donate your book to help others</div>
                   </div>
                   */}
-                </div>
+                {/* </div>
               </div>
             )}
           </li>
-        )}
+        )} */}
         {isLoggedIn && userType === 'organization' && (
           <li ref={orgDropdownRef} className="dropdown" onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}>
             <span>Organization <span className="arrow">▼</span></span>
@@ -233,7 +233,7 @@ const Navbar = () => {
             <form onSubmit={handleSearch} className="search-container">
               <input
                 type="text"
-                placeholder="Search books..."
+                placeholder="Search product..."
                 className="search-bar"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
