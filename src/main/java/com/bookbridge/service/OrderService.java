@@ -648,4 +648,27 @@ public class OrderService {
             throw new RuntimeException("Failed to sum total revenue", e);
         }
     }
+
+    @Transactional
+    public Order clearOrgPayment(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+
+        if (order.getOrgPaymentStatus() == Order.OrgPaymentStatus.PAID) {
+            throw new IllegalStateException("Payment already cleared for this order");
+        }
+
+        order.setOrgPaymentStatus(Order.OrgPaymentStatus.PAID);
+        order.setOrgPaymentClearedAt(LocalDateTime.now());
+        Order savedOrder = orderRepository.save(order);
+
+        // Notify all organizations involved in this order
+        order.getOrderItems().stream()
+                .map(item -> item.getBook().getUser())
+                .filter(user -> user != null && user.getUserType() == User.UserType.ORGANIZATION)
+                .distinct()
+                .forEach(org -> notificationService.notifyOrgPaymentCleared(org, savedOrder));
+
+        return savedOrder;
+    }
 }

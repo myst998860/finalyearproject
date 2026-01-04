@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { 
-  BookOpen, 
-  Search, 
+import {
+  BookOpen,
+  Search,
   Trash2,
   DollarSign,
   Calendar,
@@ -13,6 +13,7 @@ import {
 import { getAuthHeaders } from '../../services/api';
 import { toast } from 'react-toastify';
 import { showDeleteConfirmation, showLogoutConfirmation } from '../ConfirmationToast';
+import NotificationBell from './NotificationBell';
 import './Product.css';
 
 const Product = () => {
@@ -29,13 +30,13 @@ const Product = () => {
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
     const userType = storedUser.userType?.toLowerCase();
-    
+
     if (!storedUser.token || userType !== 'organization') {
       toast.error('Access denied. Organization login required.');
       navigate('/login');
       return;
     }
-    
+
     setUser(storedUser);
   }, [navigate]);
 
@@ -49,7 +50,7 @@ const Product = () => {
       },
       credentials: 'include'
     });
-    
+
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
         toast.error('Authentication required. Please login again.');
@@ -58,7 +59,7 @@ const Product = () => {
       }
       throw new Error('Failed to fetch books');
     }
-    
+
     return response.json();
   };
 
@@ -90,12 +91,12 @@ const Product = () => {
         },
         credentials: 'include'
       });
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText || 'Failed to delete book');
       }
-      
+
       return response.json();
     },
     onSuccess: () => {
@@ -109,8 +110,8 @@ const Product = () => {
 
   const filteredBooks = books?.filter(book => {
     const matchesSearch = book.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         book.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         book.isbn?.toLowerCase().includes(searchTerm.toLowerCase());
+      book.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      book.isbn?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'all' || book.status === filterStatus.toUpperCase();
     const matchesCategory = filterCategory === 'all' || book.category === filterCategory;
     return matchesSearch && matchesStatus && matchesCategory;
@@ -172,26 +173,26 @@ const Product = () => {
   return (
     <div className="books-container">
       {/* Header */}
-      <header style={{ 
-        background: 'white', 
-        borderBottom: '1px solid #e5e7eb', 
+      <header style={{
+        background: 'white',
+        borderBottom: '1px solid #e5e7eb',
         padding: '16px 20px',
         marginBottom: '24px',
         borderRadius: '12px 12px 0 0'
       }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'center',
           maxWidth: '1400px',
           margin: '0 auto'
         }}>
           <div>
-            <h1 style={{ 
-              margin: 0, 
-              fontSize: '24px', 
-              fontWeight: 'bold', 
-              color: '#1f2937' 
+            <h1 style={{
+              margin: 0,
+              fontSize: '24px',
+              fontWeight: 'bold',
+              color: '#1f2937'
             }}>
               Product Management
             </h1>
@@ -200,7 +201,8 @@ const Product = () => {
             </p>
           </div>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <button 
+            <NotificationBell />
+            <button
               onClick={() => navigate('/adminpanel')}
               style={{
                 padding: '8px 16px',
@@ -227,7 +229,7 @@ const Product = () => {
             <span style={{ color: '#6b7280', fontSize: '14px' }}>
               {user.fullName || user.email}
             </span>
-            <button 
+            <button
               onClick={handleLogout}
               style={{
                 padding: '8px 16px',
@@ -252,218 +254,218 @@ const Product = () => {
       {/* Content */}
       <div>
 
-      {/* Stats Cards */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div className="stat-icon" style={{ background: '#dbeafe' }}>
-              <BookOpen style={{ width: '20px', height: '20px', color: '#3b82f6' }} />
+        {/* Stats Cards */}
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div className="stat-icon" style={{ background: '#dbeafe' }}>
+                <BookOpen style={{ width: '20px', height: '20px', color: '#3b82f6' }} />
+              </div>
+              <div>
+                <div className="stat-value">{books?.length || 0}</div>
+                <div className="stat-label">Total Books</div>
+              </div>
             </div>
-            <div>
-              <div className="stat-value">{books?.length || 0}</div>
-              <div className="stat-label">Total Books</div>
+          </div>
+
+          <div className="stat-card">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div className="stat-icon" style={{ background: '#dcfce7' }}>
+                <Tag style={{ width: '20px', height: '20px', color: '#10b981' }} />
+              </div>
+              <div>
+                <div className="stat-value">{books?.filter(b => b.status === 'AVAILABLE').length || 0}</div>
+                <div className="stat-label">Available</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div className="stat-icon" style={{ background: '#fef3c7' }}>
+                <DollarSign style={{ width: '20px', height: '20px', color: '#f59e0b' }} />
+              </div>
+              <div>
+                <div className="stat-value">Rs. {books?.reduce((sum, book) => sum + (book.price || 0), 0) || 0}</div>
+                <div className="stat-label">Total Value</div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="stat-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div className="stat-icon" style={{ background: '#dcfce7' }}>
-              <Tag style={{ width: '20px', height: '20px', color: '#10b981' }} />
+        {/* Filters */}
+        <div className="filters-container">
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ position: 'relative', flex: 1, minWidth: '300px' }}>
+              <Search style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: '20px',
+                height: '20px',
+                color: '#9ca3af'
+              }} />
+              <input
+                type="text"
+                placeholder="Search books by title, author, or ISBN..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
             </div>
-            <div>
-              <div className="stat-value">{books?.filter(b => b.status === 'AVAILABLE').length || 0}</div>
-              <div className="stat-label">Available</div>
-            </div>
+
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Status</option>
+              {statuses.map(status => (
+                <option key={status} value={status.toLowerCase()}>{status}</option>
+              ))}
+            </select>
+
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Categories</option>
+              {categories.map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
           </div>
         </div>
 
-        <div className="stat-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div className="stat-icon" style={{ background: '#fef3c7' }}>
-              <DollarSign style={{ width: '20px', height: '20px', color: '#f59e0b' }} />
-            </div>
-            <div>
-              <div className="stat-value">Rs. {books?.reduce((sum, book) => sum + (book.price || 0), 0) || 0}</div>
-              <div className="stat-label">Total Value</div>
-            </div>
+        {/* Books Grid */}
+        <div className="books-grid-container">
+          <div className="books-grid-header">
+            <h3 className="books-grid-title">Books ({filteredBooks.length})
+              {totalPages > 1 && (
+                <span className="books-grid-page-info">
+                  (Page {currentPage} of {totalPages})
+                </span>
+              )}
+            </h3>
           </div>
-        </div>
-      </div>
 
-      {/* Filters */}
-      <div className="filters-container">
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <div style={{ position: 'relative', flex: 1, minWidth: '300px' }}>
-            <Search style={{ 
-              position: 'absolute', 
-              left: '12px', 
-              top: '50%', 
-              transform: 'translateY(-50%)',
-              width: '20px',
-              height: '20px',
-              color: '#9ca3af'
-            }} />
-            <input
-              type="text"
-              placeholder="Search books by title, author, or ISBN..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-          </div>
-          
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Status</option>
-            {statuses.map(status => (
-              <option key={status} value={status.toLowerCase()}>{status}</option>
-            ))}
-          </select>
+          <div className="books-grid-content">
+            <div className="books-grid">
+              {currentBooks.map((book) => (
+                <div key={book.id} className="book-card">
+                  <div className="book-header">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div className="book-icon-container">
+                        <BookOpen className="book-icon" />
+                      </div>
+                      <div>
+                        <h4 className="book-title">{book.title}</h4>
+                        <p className="book-author">by {book.author}</p>
+                      </div>
+                    </div>
 
-          <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Categories</option>
-            {categories.map(category => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </select>
-        </div>
-      </div>
+                    <div className="book-actions">
+                      <button
+                        onClick={() => handleDeleteBook(book.id, book.title)}
+                        className="delete-button"
+                        title="Delete Book"
+                      >
+                        <Trash2 className="delete-icon" />
+                      </button>
+                    </div>
+                  </div>
 
-      {/* Books Grid */}
-      <div className="books-grid-container">
-        <div className="books-grid-header">
-          <h3 className="books-grid-title">Books ({filteredBooks.length})
-            {totalPages > 1 && (
-              <span className="books-grid-page-info">
-                (Page {currentPage} of {totalPages})
-              </span>
+                  <div className="book-details">
+                    <div className="detail-row">
+                      <span className="detail-label">Price:</span>
+                      <span className="detail-value">Rs. {book.price || 0}/-</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Category:</span>
+                      <span className="detail-value">{book.category || 'Unknown'}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Condition:</span>
+                      <span className="detail-value">{book.condition || 'Unknown'}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">ISBN:</span>
+                      <span className="detail-value">{book.isbn || 'N/A'}</span>
+                    </div>
+                  </div>
+
+                  <div className="book-status-info">
+                    <span className={`status-badge ${book.status === 'AVAILABLE' ? 'available' : 'unavailable'}`}>
+                      {book.status || 'UNKNOWN'}
+                    </span>
+
+                    <div className="status-meta">
+                      <Calendar className="status-icon" />
+                      {new Date(book.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+
+                  {book.description && (
+                    <div className="book-description">
+                      <p>
+                        {book.description}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {filteredBooks.length === 0 && (
+              <div className="no-books-message">
+                No books found matching your criteria
+              </div>
             )}
-          </h3>
-        </div>
 
-        <div className="books-grid-content">
-          <div className="books-grid">
-            {currentBooks.map((book) => (
-              <div key={book.id} className="book-card">
-                <div className="book-header">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div className="book-icon-container">
-                      <BookOpen className="book-icon" />
-                    </div>
-                    <div>
-                      <h4 className="book-title">{book.title}</h4>
-                      <p className="book-author">by {book.author}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="book-actions">
-                    <button
-                      onClick={() => handleDeleteBook(book.id, book.title)}
-                      className="delete-button"
-                      title="Delete Book"
-                    >
-                      <Trash2 className="delete-icon" />
-                    </button>
-                  </div>
+            {/* Pagination */}
+            {filteredBooks.length > 0 && totalPages > 1 && (
+              <div className="pagination-container">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="pagination-button"
+                >
+                  Previous
+                </button>
+
+                <div className="pagination-numbers">
+                  {Array.from({ length: totalPages }, (_, index) => {
+                    const pageNumber = index + 1;
+                    const isCurrentPage = pageNumber === currentPage;
+
+                    return (
+                      <button
+                        key={pageNumber}
+                        onClick={() => setCurrentPage(pageNumber)}
+                        className={`pagination-number-button ${isCurrentPage ? 'active' : ''}`}
+                      >
+                        {pageNumber}
+                      </button>
+                    );
+                  })}
                 </div>
 
-                <div className="book-details">
-                  <div className="detail-row">
-                    <span className="detail-label">Price:</span>
-                    <span className="detail-value">Rs. {book.price || 0}/-</span>
-                  </div>
-                  
-                  <div className="detail-row">
-                    <span className="detail-label">Category:</span>
-                    <span className="detail-value">{book.category || 'Unknown'}</span>
-                  </div>
-                  
-                  <div className="detail-row">
-                    <span className="detail-label">Condition:</span>
-                    <span className="detail-value">{book.condition || 'Unknown'}</span>
-                  </div>
-                  
-                  <div className="detail-row">
-                    <span className="detail-label">ISBN:</span>
-                    <span className="detail-value">{book.isbn || 'N/A'}</span>
-                  </div>
-                </div>
-
-                <div className="book-status-info">
-                  <span className={`status-badge ${book.status === 'AVAILABLE' ? 'available' : 'unavailable'}`}>
-                    {book.status || 'UNKNOWN'}
-                  </span>
-                  
-                  <div className="status-meta">
-                    <Calendar className="status-icon" />
-                    {new Date(book.createdAt).toLocaleDateString()}
-                  </div>
-                </div>
-
-                {book.description && (
-                  <div className="book-description">
-                    <p>
-                      {book.description}
-                    </p>
-                  </div>
-                )}
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="pagination-button"
+                >
+                  Next
+                </button>
               </div>
-            ))}
+            )}
           </div>
-
-          {filteredBooks.length === 0 && (
-            <div className="no-books-message">
-              No books found matching your criteria
-            </div>
-          )}
-
-          {/* Pagination */}
-          {filteredBooks.length > 0 && totalPages > 1 && (
-            <div className="pagination-container">
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className="pagination-button"
-              >
-                Previous
-              </button>
-
-              <div className="pagination-numbers">
-                {Array.from({ length: totalPages }, (_, index) => {
-                  const pageNumber = index + 1;
-                  const isCurrentPage = pageNumber === currentPage;
-                  
-                  return (
-                    <button
-                      key={pageNumber}
-                      onClick={() => setCurrentPage(pageNumber)}
-                      className={`pagination-number-button ${isCurrentPage ? 'active' : ''}`}
-                    >
-                      {pageNumber}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className="pagination-button"
-              >
-                Next
-              </button>
-            </div>
-          )}
         </div>
-      </div>
       </div>
     </div>
   );

@@ -622,6 +622,30 @@ public class AdminController {
         }
     }
 
+    @PutMapping("/orders/{orderId}/clear-org-payment")
+    public ResponseEntity<?> clearOrgPayment(
+            @PathVariable Long orderId,
+            HttpServletRequest request) {
+
+        if (!isAdminAuthenticated(request)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "Admin authentication required. Please login as admin."));
+        }
+
+        try {
+            Order updatedOrder = orderService.clearOrgPayment(orderId);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Organization payment cleared successfully",
+                    "order", updatedOrder));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Error clearing organization payment: " + e.getMessage()));
+        }
+    }
+
     @GetMapping("/health")
     public ResponseEntity<?> healthCheck() {
         return ResponseEntity.ok(Map.of(

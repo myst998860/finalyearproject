@@ -15,12 +15,14 @@ public class NotificationService {
     @Autowired
     private NotificationRepository notificationRepository;
 
-    public Notification createNotification(User user, String title, String message, Notification.NotificationType type) {
+    public Notification createNotification(User user, String title, String message,
+            Notification.NotificationType type) {
         Notification notification = new Notification(user, title, message, type);
         return notificationRepository.save(notification);
     }
 
-    public Notification createNotification(User user, String title, String message, Notification.NotificationType type, Book book, Order order) {
+    public Notification createNotification(User user, String title, String message, Notification.NotificationType type,
+            Book book, Order order) {
         Notification notification = new Notification(user, title, message, type, book, order);
         return notificationRepository.save(notification);
     }
@@ -29,14 +31,13 @@ public class NotificationService {
         User seller = book.getUser();
         String title = "Your Book Has Been Ordered!";
         String message = String.format(
-            "Great news! Your book '%s' has been ordered by %s. " +
-            "Order #%s. Please submit your book to our nearest pickup point within 48 hours. " +
-            "You'll receive payment once the book is transferred to the buyer.",
-            book.getTitle(),
-            buyer.getFullName(),
-            order.getOrderNumber()
-        );
-        
+                "Great news! Your book '%s' has been ordered by %s. " +
+                        "Order #%s. Please submit your book to our nearest pickup point within 48 hours. " +
+                        "You'll receive payment once the book is transferred to the buyer.",
+                book.getTitle(),
+                buyer.getFullName(),
+                order.getOrderNumber());
+
         createNotification(seller, title, message, Notification.NotificationType.ORDER, book, order);
     }
 
@@ -44,12 +45,11 @@ public class NotificationService {
         User seller = book.getUser();
         String title = "Book Picked Up Successfully!";
         String message = String.format(
-            "Your book '%s' has been picked up from the pickup point. " +
-            "Payment of Rs. %s will be processed within 24 hours.",
-            book.getTitle(),
-            book.getPrice()
-        );
-        
+                "Your book '%s' has been picked up from the pickup point. " +
+                        "Payment of Rs. %s will be processed within 24 hours.",
+                book.getTitle(),
+                book.getPrice());
+
         createNotification(seller, title, message, Notification.NotificationType.PAYMENT, book, order);
     }
 
@@ -57,24 +57,31 @@ public class NotificationService {
         User seller = book.getUser();
         String title = "Payment Processed!";
         String message = String.format(
-            "Payment of Rs. %s for your book '%s' has been processed and credited to your account.",
-            book.getPrice(),
-            book.getTitle()
-        );
-        
+                "Payment of Rs. %s for your book '%s' has been processed and credited to your account.",
+                book.getPrice(),
+                book.getTitle());
+
         createNotification(seller, title, message, Notification.NotificationType.PAYMENT, book, order);
+    }
+
+    public void notifyOrgPaymentCleared(User organization, Order order) {
+        String title = "Payment Cleared for Order #" + order.getOrderNumber();
+        String message = String.format(
+                "The platform has cleared the payment for your books in order #%s. " +
+                        "The funds should be available in your account now.",
+                order.getOrderNumber());
+        createNotification(organization, title, message, Notification.NotificationType.PAYMENT, null, order);
     }
 
     public void notifyBuyerBookDelivered(Book book, Order order) {
         User buyer = order.getUser();
         String title = "Your Book Has Been Delivered!";
         String message = String.format(
-            "Your order for '%s' has been delivered successfully. " +
-            "Order #%s. Enjoy your book!",
-            book.getTitle(),
-            order.getOrderNumber()
-        );
-        
+                "Your order for '%s' has been delivered successfully. " +
+                        "Order #%s. Enjoy your book!",
+                book.getTitle(),
+                order.getOrderNumber());
+
         createNotification(buyer, title, message, Notification.NotificationType.DELIVERY, book, order);
     }
 
@@ -112,4 +119,4 @@ public class NotificationService {
     public void deleteNotification(Long notificationId) {
         notificationRepository.deleteById(notificationId);
     }
-} 
+}

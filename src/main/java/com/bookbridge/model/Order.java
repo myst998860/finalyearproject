@@ -25,11 +25,10 @@ public class Order {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "orders", "books", "sentMessages", "receivedMessages"})
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "orders", "books", "sentMessages",
+            "receivedMessages" })
     private User user;
 
-    
-    
     @NotNull
     @DecimalMin(value = "0.0")
     @Column(name = "total_amount", precision = 10, scale = 2)
@@ -57,11 +56,11 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private List<OrderItem> orderItems;
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Payment payment;
 
     @CreationTimestamp
@@ -75,8 +74,16 @@ public class Order {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "org_payment_status")
+    private OrgPaymentStatus orgPaymentStatus = OrgPaymentStatus.UNPAID;
+
+    @Column(name = "org_payment_cleared_at")
+    private LocalDateTime orgPaymentClearedAt;
+
     // Constructors
-    public Order() {}
+    public Order() {
+    }
 
     public Order(User user, BigDecimal totalAmount, String deliveryAddress) {
         this.user = user;
@@ -91,50 +98,141 @@ public class Order {
     }
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getOrderNumber() { return orderNumber; }
-    public void setOrderNumber(String orderNumber) { this.orderNumber = orderNumber; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    public String getOrderNumber() {
+        return orderNumber;
+    }
 
-    public BigDecimal getTotalAmount() { return totalAmount; }
-    public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
+    public void setOrderNumber(String orderNumber) {
+        this.orderNumber = orderNumber;
+    }
 
-    public OrderStatus getStatus() { return status; }
-    public void setStatus(OrderStatus status) { this.status = status; }
+    public User getUser() {
+        return user;
+    }
 
-    public String getDeliveryAddress() { return deliveryAddress; }
-    public void setDeliveryAddress(String deliveryAddress) { this.deliveryAddress = deliveryAddress; }
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-    public String getDeliveryPhone() { return deliveryPhone; }
-    public void setDeliveryPhone(String deliveryPhone) { this.deliveryPhone = deliveryPhone; }
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
 
-    public String getDeliveryNotes() { return deliveryNotes; }
-    public void setDeliveryNotes(String deliveryNotes) { this.deliveryNotes = deliveryNotes; }
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
 
-    public LocalDateTime getEstimatedDelivery() { return estimatedDelivery; }
-    public void setEstimatedDelivery(LocalDateTime estimatedDelivery) { this.estimatedDelivery = estimatedDelivery; }
+    public OrderStatus getStatus() {
+        return status;
+    }
 
-    public DeliveryStatus getDeliveryStatus() { return deliveryStatus; }
-    public void setDeliveryStatus(DeliveryStatus deliveryStatus) { this.deliveryStatus = deliveryStatus; }
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
 
-    public List<OrderItem> getOrderItems() { return orderItems; }
-    public void setOrderItems(List<OrderItem> orderItems) { this.orderItems = orderItems; }
+    public String getDeliveryAddress() {
+        return deliveryAddress;
+    }
 
-    public Payment getPayment() { return payment; }
-    public void setPayment(Payment payment) { this.payment = payment; }
+    public void setDeliveryAddress(String deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public String getDeliveryPhone() {
+        return deliveryPhone;
+    }
 
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public void setDeliveryPhone(String deliveryPhone) {
+        this.deliveryPhone = deliveryPhone;
+    }
 
-    public LocalDateTime getCompletedAt() { return completedAt; }
-    public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; }
+    public String getDeliveryNotes() {
+        return deliveryNotes;
+    }
+
+    public void setDeliveryNotes(String deliveryNotes) {
+        this.deliveryNotes = deliveryNotes;
+    }
+
+    public LocalDateTime getEstimatedDelivery() {
+        return estimatedDelivery;
+    }
+
+    public void setEstimatedDelivery(LocalDateTime estimatedDelivery) {
+        this.estimatedDelivery = estimatedDelivery;
+    }
+
+    public DeliveryStatus getDeliveryStatus() {
+        return deliveryStatus;
+    }
+
+    public void setDeliveryStatus(DeliveryStatus deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
+    }
+
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(LocalDateTime completedAt) {
+        this.completedAt = completedAt;
+    }
+
+    public OrgPaymentStatus getOrgPaymentStatus() {
+        return orgPaymentStatus;
+    }
+
+    public void setOrgPaymentStatus(OrgPaymentStatus orgPaymentStatus) {
+        this.orgPaymentStatus = orgPaymentStatus;
+    }
+
+    public LocalDateTime getOrgPaymentClearedAt() {
+        return orgPaymentClearedAt;
+    }
+
+    public void setOrgPaymentClearedAt(LocalDateTime orgPaymentClearedAt) {
+        this.orgPaymentClearedAt = orgPaymentClearedAt;
+    }
 
     // Enums
     public enum OrderStatus {
@@ -143,5 +241,9 @@ public class Order {
 
     public enum DeliveryStatus {
         PENDING, SHIPPED, IN_TRANSIT, DELIVERED, FAILED
+    }
+
+    public enum OrgPaymentStatus {
+        UNPAID, PAID
     }
 }

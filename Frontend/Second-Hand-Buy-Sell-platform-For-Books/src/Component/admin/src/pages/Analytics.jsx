@@ -25,7 +25,7 @@ import {
   AreaChart,
   Area
 } from 'recharts';
-import { getDashboardStats, getAllOrders, getAllBooks, getAllUsers, getOrderAnalytics, getPaymentAnalytics, getBusinessAnalytics, downloadAnalyticsPDF } from '../services/api.js';
+import { getDashboardStats, getAllOrders, getAllBooks, getAllUsers, getOrderAnalytics, getPaymentAnalytics, getBusinessAnalytics, downloadAnalyticsPDF, clearOrgPayment } from '../services/api.js';
 import { useAuthRedirect } from '../hooks/useAuthRedirect';
 
 export default function Analytics() {
@@ -258,6 +258,20 @@ export default function Analytics() {
       alert('Error generating PDF. Please try again.');
     } finally {
       setIsGeneratingPDF(false);
+    }
+  };
+
+  const handleClearPayment = async (orderId) => {
+    if (window.confirm('Are you sure you want to mark this organization payment as cleared?')) {
+      try {
+        await clearOrgPayment(orderId);
+        alert('Payment cleared successfully. Organization has been notified.');
+        // Refresh orders data
+        window.location.reload();
+      } catch (error) {
+        console.error('Error clearing payment:', error);
+        alert('Failed to clear payment: ' + error.message);
+      }
     }
   };
 
@@ -838,6 +852,83 @@ export default function Analytics() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Organization Settlements Table */}
+      <div style={{ marginTop: '32px' }}>
+        <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1f2937', marginBottom: '16px' }}>
+          Organization Settlements Tracking
+        </h3>
+        <div style={{
+          background: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+          border: '1px solid #e5e7eb',
+          overflow: 'hidden'
+        }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e5e7eb' }}>
+              <tr>
+                <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#4b5563' }}>Order #</th>
+                <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#4b5563' }}>Date</th>
+                <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#4b5563' }}>Amount</th>
+                <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#4b5563' }}>Payment Status</th>
+                <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#4b5563' }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders?.filter(o => o.status === 'DELIVERED').map(order => (
+                <tr key={order.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                  <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1f2937' }}>{order.orderNumber}</td>
+                  <td style={{ padding: '12px 16px', fontSize: '14px', color: '#4b5563' }}>
+                    {new Date(order.createdAt).toLocaleDateString()}
+                  </td>
+                  <td style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#10b981' }}>
+                    Rs. {order.totalAmount}/-
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    <span style={{
+                      padding: '4px 10px',
+                      borderRadius: '9999px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      background: order.orgPaymentStatus === 'PAID' ? '#dcfce7' : '#fee2e2',
+                      color: order.orgPaymentStatus === 'PAID' ? '#15803d' : '#991b1b'
+                    }}>
+                      {order.orgPaymentStatus || 'UNPAID'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    {order.orgPaymentStatus !== 'PAID' && (
+                      <button
+                        onClick={() => handleClearPayment(order.id)}
+                        style={{
+                          padding: '6px 12px',
+                          background: '#3b82f6',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Mark as Paid
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {(!orders || orders.filter(o => o.status === 'DELIVERED').length === 0) && (
+                <tr>
+                  <td colSpan="5" style={{ padding: '24px', textAlign: 'center', color: '#6b7280' }}>
+                    No settled orders found to display.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

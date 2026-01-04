@@ -29,6 +29,7 @@ import {
 import { getAuthHeaders } from '../../services/api';
 import { toast } from 'react-toastify';
 import { showLogoutConfirmation } from '../ConfirmationToast';
+import NotificationBell from './NotificationBell';
 
 const Analytics = () => {
   const navigate = useNavigate();
@@ -538,6 +539,7 @@ const Analytics = () => {
             </p>
           </div>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <NotificationBell />
             <button
               onClick={() => navigate('/adminpanel')}
               style={{
@@ -1102,6 +1104,67 @@ const Analytics = () => {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Settlement Tracking Table */}
+        <div style={{ marginTop: '32px' }}>
+          <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1f2937', marginBottom: '16px' }}>
+            Payment Settlement from Platform
+          </h3>
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+            border: '1px solid #e5e7eb',
+            overflow: 'hidden'
+          }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e5e7eb' }}>
+                <tr>
+                  <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#4b5563' }}>Order #</th>
+                  <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#4b5563' }}>Order Date</th>
+                  <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#4b5563' }}>Total Amount</th>
+                  <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#4b5563' }}>Platform Settlement</th>
+                  <th style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#4b5563' }}>Settled Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders?.filter(o => o.status === 'DELIVERED').map(order => (
+                  <tr key={order.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1f2937' }}>{order.orderNumber}</td>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', color: '#4b5563' }}>
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </td>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#10b981' }}>
+                      Rs. {order.totalAmount}/-
+                    </td>
+                    <td style={{ padding: '12px 16px' }}>
+                      <span style={{
+                        padding: '4px 10px',
+                        borderRadius: '9999px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        background: order.orgPaymentStatus === 'PAID' ? '#dcfce7' : '#fee2e2',
+                        color: order.orgPaymentStatus === 'PAID' ? '#15803d' : '#991b1b'
+                      }}>
+                        {order.orgPaymentStatus || 'UNPAID'}
+                      </span>
+                    </td>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', color: '#4b5563' }}>
+                      {order.orgPaymentClearedAt ? new Date(order.orgPaymentClearedAt).toLocaleDateString() : '—'}
+                    </td>
+                  </tr>
+                ))}
+                {(!orders || orders.filter(o => o.status === 'DELIVERED').length === 0) && (
+                  <tr>
+                    <td colSpan="5" style={{ padding: '24px', textAlign: 'center', color: '#6b7280' }}>
+                      No delivered orders found for settlement tracking.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

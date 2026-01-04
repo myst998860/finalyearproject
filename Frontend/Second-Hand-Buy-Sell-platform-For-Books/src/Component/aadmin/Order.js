@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { 
-  ShoppingCart, 
-  Eye, 
-  Search, 
+import {
+  ShoppingCart,
+  Eye,
+  Search,
   AlertCircle,
   CheckCircle,
   Clock,
@@ -15,6 +15,7 @@ import {
 import { getAllOrders, updateOrderStatus, getImageUrl, getAuthHeaders } from '../../services/api';
 import { toast } from 'react-toastify';
 import { showLogoutConfirmation } from '../ConfirmationToast';
+import NotificationBell from './NotificationBell';
 import './Order.css';
 
 const Order = () => {
@@ -34,13 +35,13 @@ const Order = () => {
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
     const userType = storedUser.userType?.toLowerCase();
-    
+
     if (!storedUser.token || userType !== 'organization') {
       toast.error('Access denied. Organization login required.');
       navigate('/login');
       return;
     }
-    
+
     setUser(storedUser);
   }, [navigate]);
 
@@ -86,7 +87,7 @@ const Order = () => {
       headers: headers,
       credentials: 'include'
     });
-    
+
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
         toast.error('Authentication required. Please login again.');
@@ -95,7 +96,7 @@ const Order = () => {
       }
       throw new Error('Failed to fetch orders');
     }
-    
+
     return response.json();
   };
 
@@ -129,12 +130,12 @@ const Order = () => {
         credentials: 'include',
         body: JSON.stringify({ status })
       });
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText || 'Failed to update order status');
       }
-      
+
       return response.json();
     },
     onSuccess: () => {
@@ -145,7 +146,7 @@ const Order = () => {
     onError: (error) => {
       console.error('Update order status error:', error);
       let errorMessage = 'Failed to update order status';
-      
+
       if (error.message.includes('403')) {
         errorMessage = 'Access denied. Please login again.';
       } else if (error.message.includes('401')) {
@@ -157,7 +158,7 @@ const Order = () => {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       setSuccessMessage(errorMessage);
       setShowSuccessModal(true);
     }
@@ -165,8 +166,8 @@ const Order = () => {
 
   const filteredOrders = orders?.filter(order => {
     const matchesSearch = order.orderNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.user?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.user?.email?.toLowerCase().includes(searchTerm.toLowerCase());
+      order.user?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.user?.email?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterStatus === 'all' || order.status === filterStatus.toUpperCase();
     return matchesSearch && matchesFilter;
   }) || [];
@@ -271,6 +272,7 @@ const Order = () => {
             <span className="order-badge">Organization Orders</span>
           </div>
           <div className="order-header-actions">
+            <NotificationBell />
             <button className="order-back-btn" onClick={() => navigate('/adminpanel')}>
               Back to Panel
             </button>
@@ -333,7 +335,7 @@ const Order = () => {
               className="order-search-input"
             />
           </div>
-          
+
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
@@ -390,7 +392,7 @@ const Order = () => {
                         <strong>Rs. {order.totalAmount}</strong>
                       </td>
                       <td>
-                        <span 
+                        <span
                           className="order-status-badge"
                           style={{ background: getStatusColor(order.status) }}
                         >
@@ -408,7 +410,7 @@ const Order = () => {
                             <Eye style={{ width: '14px', height: '14px' }} />
                             View
                           </button>
-                          
+
                           <select
                             value={order.status}
                             onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
@@ -464,8 +466,8 @@ const Order = () => {
                   {/* Book Image */}
                   <div className="order-modal-book-image">
                     {selectedOrder.orderItems && selectedOrder.orderItems.length > 0 ? (
-                      <img 
-                        src={getImageUrl(selectedOrder.orderItems[0].book?.image || selectedOrder.orderItems[0].book?.bookImage)} 
+                      <img
+                        src={getImageUrl(selectedOrder.orderItems[0].book?.image || selectedOrder.orderItems[0].book?.bookImage)}
                         alt={selectedOrder.orderItems[0].book?.title || 'Book'}
                         onError={(e) => {
                           e.target.style.display = 'none';
@@ -480,7 +482,7 @@ const Order = () => {
                       </div>
                     )}
                   </div>
-                  
+
                   <div>
                     <h2 className="order-modal-title">📋 Order Details</h2>
                     <div className="order-modal-order-number">
@@ -488,7 +490,7 @@ const Order = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <button
                   onClick={() => setShowOrderDetails(false)}
                   className="order-modal-close-btn"
@@ -510,7 +512,7 @@ const Order = () => {
                     </div>
                     <div>
                       <div className="order-summary-label">STATUS</div>
-                      <span 
+                      <span
                         className="order-status-badge"
                         style={{ background: getStatusColor(selectedOrder.status) }}
                       >
@@ -561,20 +563,20 @@ const Order = () => {
                         <div className="order-item-content">
                           {/* Book Image */}
                           <div className="order-item-image">
-                            <img 
-                              src={getImageUrl(item.book?.image || item.book?.bookImage)} 
+                            <img
+                              src={getImageUrl(item.book?.image || item.book?.bookImage)}
                               alt={item.book?.title}
                               onError={(e) => {
                                 e.target.src = 'https://via.placeholder.com/100x120/f3f4f6/9ca3af?text=No+Image';
                               }}
                             />
                           </div>
-                          
+
                           {/* Book Details */}
                           <div className="order-item-details">
                             <div className="order-item-title">{item.book?.title}</div>
                             <div className="order-item-author">by {item.book?.author}</div>
-                            
+
                             <div className="order-item-footer">
                               <div className="order-item-quantity">Qty: {item.quantity}</div>
                               <div className="order-item-price">Rs. {item.unitPrice}</div>

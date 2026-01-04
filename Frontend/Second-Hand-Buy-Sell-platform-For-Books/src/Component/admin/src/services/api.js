@@ -13,12 +13,12 @@ const getAuthHeaders = () => {
 // Helper function to get image URL (handles both Cloudinary and local URLs)
 export const getImageUrl = (imagePath) => {
   if (!imagePath) return null;
-  
+
   // If it's already a full URL (Cloudinary), return as is
   if (imagePath.startsWith('http')) {
     return imagePath;
   }
-  
+
   // If it's a local file path, construct the full URL
   return `${BASE_URL}/files/${imagePath}`;
 };
@@ -27,28 +27,28 @@ export const getImageUrl = (imagePath) => {
 export const adminLogin = async (credentials) => {
   try {
     console.log('Attempting admin login with:', credentials.email);
-    
-  const response = await fetch(`${BASE_URL}/admin/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+
+    const response = await fetch(`${BASE_URL}/admin/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(credentials),
       credentials: 'include' // Include cookies for session-based auth
-  });
-    
+    });
+
     console.log('Login response status:', response.status);
     console.log('Login response headers:', response.headers);
-  
-  if (!response.ok) {
+
+    if (!response.ok) {
       const errorText = await response.text();
       console.error('Login error response:', errorText);
-    throw new Error('Admin login failed');
-  }
-  
-  const data = await response.json();
+      throw new Error('Admin login failed');
+    }
+
+    const data = await response.json();
     console.log('Login successful:', data);
-  return data;
+    return data;
   } catch (error) {
     console.error('Error in adminLogin:', error);
     throw error;
@@ -61,11 +61,11 @@ export const getDashboardStats = async () => {
     headers: getAuthHeaders(),
     credentials: 'include' // Include cookies for session-based auth
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch dashboard stats');
   }
-  
+
   return response.json();
 };
 
@@ -73,21 +73,21 @@ export const getDashboardStats = async () => {
 export const getAllUsers = async (page = 0, size = 10) => {
   try {
     console.log('Fetching users from:', `${BASE_URL}/admin/users?page=${page}&size=${size}`);
-    
-  const response = await fetch(`${BASE_URL}/admin/users?page=${page}&size=${size}`, {
+
+    const response = await fetch(`${BASE_URL}/admin/users?page=${page}&size=${size}`, {
       headers: getAuthHeaders(),
       credentials: 'include' // Include cookies for session-based auth
-  });
-    
+    });
+
     console.log('Response status:', response.status);
     console.log('Response headers:', response.headers);
-  
-  if (!response.ok) {
+
+    if (!response.ok) {
       const errorText = await response.text();
       console.error('Error response:', errorText);
       throw new Error(`Failed to fetch users: ${response.status} ${response.statusText}`);
-  }
-  
+    }
+
     const data = await response.json();
     console.log('Users data received:', data);
     return data;
@@ -103,11 +103,11 @@ export const blockUser = async (userId) => {
     headers: getAuthHeaders(),
     credentials: 'include' // Include cookies for session-based auth
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to block user');
   }
-  
+
   return response.json();
 };
 
@@ -117,11 +117,11 @@ export const unblockUser = async (userId) => {
     headers: getAuthHeaders(),
     credentials: 'include' // Include cookies for session-based auth
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to unblock user');
   }
-  
+
   return response.json();
 };
 
@@ -131,11 +131,11 @@ export const deleteUser = async (userId) => {
     headers: getAuthHeaders(),
     credentials: 'include' // Include cookies for session-based auth
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to delete user');
   }
-  
+
   return response.json();
 };
 
@@ -145,11 +145,11 @@ export const getAllBooks = async () => {
     headers: getAuthHeaders(),
     credentials: 'include' // Include cookies for session-based auth
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch books');
   }
-  
+
   return response.json();
 };
 
@@ -159,11 +159,11 @@ export const deleteBook = async (bookId) => {
     headers: getAuthHeaders(),
     credentials: 'include' // Include cookies for session-based auth
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to delete book');
   }
-  
+
   return response.json();
 };
 
@@ -173,11 +173,11 @@ export const getAllPayments = async (page = 0, size = 10) => {
     headers: getAuthHeaders(),
     credentials: 'include' // Include cookies for session-based auth
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch payments');
   }
-  
+
   return response.json();
 };
 
@@ -187,11 +187,11 @@ export const getAllOrders = async () => {
     headers: getAuthHeaders(),
     credentials: 'include' // Include cookies for session-based auth
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch orders');
   }
-  
+
   return response.json();
 };
 
@@ -202,11 +202,26 @@ export const updateOrderStatus = async (orderId, status) => {
     body: JSON.stringify({ status }),
     credentials: 'include' // Include cookies for session-based auth
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to update order status');
   }
-  
+
+  return response.json();
+};
+
+export const clearOrgPayment = async (orderId) => {
+  const response = await fetch(`${BASE_URL}/admin/orders/${orderId}/clear-org-payment`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    credentials: 'include'
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || 'Failed to clear organization payment');
+  }
+
   return response.json();
 };
 
@@ -218,11 +233,11 @@ export const logUpworkTransaction = async (transactionData) => {
     body: JSON.stringify(transactionData),
     credentials: 'include' // Include cookies for session-based auth
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to log upwork transaction');
   }
-  
+
   return response.json();
 };
 
@@ -231,11 +246,11 @@ export const getUpworkTransactions = async (page = 0, size = 10) => {
     headers: getAuthHeaders(),
     credentials: 'include' // Include cookies for session-based auth
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch upwork transactions');
   }
-  
+
   return response.json();
 };
 
@@ -246,11 +261,11 @@ export const updateUpworkTransactionStatus = async (transactionId, status) => {
     body: JSON.stringify({ status }),
     credentials: 'include' // Include cookies for session-based auth
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to update upwork transaction status');
   }
-  
+
   return response.json();
 };
 
@@ -260,11 +275,11 @@ export const getOrderAnalytics = async () => {
     headers: getAuthHeaders(),
     credentials: 'include' // Include cookies for session-based auth
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch order analytics');
   }
-  
+
   return response.json();
 };
 
@@ -273,11 +288,11 @@ export const getPaymentAnalytics = async () => {
     headers: getAuthHeaders(),
     credentials: 'include' // Include cookies for session-based auth
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch payment analytics');
   }
-  
+
   return response.json();
 };
 
@@ -286,11 +301,11 @@ export const getBusinessAnalytics = async () => {
     headers: getAuthHeaders(),
     credentials: 'include' // Include cookies for session-based auth
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch business analytics');
   }
-  
+
   return response.json();
 };
 
@@ -299,11 +314,11 @@ export const downloadAnalyticsPDF = async () => {
     headers: getAuthHeaders(),
     credentials: 'include' // Include cookies for session-based auth
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to download analytics PDF');
   }
-  
+
   const blob = await response.blob();
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -356,5 +371,4 @@ export const getAdminSession = () => {
 export const adminLogout = () => {
   localStorage.removeItem('adminUser');
   localStorage.removeItem('adminToken');
-}; 
- 
+};
